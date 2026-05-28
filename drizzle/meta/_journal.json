@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1779294532511,
+      "tag": "0000_glamorous_masque",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1779294922907,
+      "tag": "0001_mixed_stardust",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1779295339137,
+      "tag": "0002_grey_warlock",
+      "breakpoints": true
+    }
+  ]
+}
