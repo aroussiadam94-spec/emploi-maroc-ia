@@ -132,7 +132,8 @@ export async function getDb(): Promise<AnyDb | null> {
   if (_db) return _db;
 
   const dbUrl = process.env.DATABASE_URL;
-  const useSqlite = !dbUrl || dbUrl.startsWith("./") || dbUrl.endsWith(".db");
+  const useTurso = dbUrl?.startsWith("libsql://") || dbUrl?.startsWith("https://") || !!process.env.DATABASE_AUTH_TOKEN;
+  const useSqlite = useTurso || !dbUrl || dbUrl.startsWith("./") || dbUrl.endsWith(".db");
 
   if (useSqlite) {
     try {
@@ -140,16 +141,26 @@ export async function getDb(): Promise<AnyDb | null> {
       const { createClient } = await import("@libsql/client");
       const { drizzle } = await import("drizzle-orm/libsql");
 
-      const dbPath = path.resolve(process.cwd(), "local.db");
-      const client = createClient({ url: `file:${dbPath}` });
+      let client;
+      if (useTurso && dbUrl) {
+        client = createClient({
+          url: dbUrl,
+          authToken: process.env.DATABASE_AUTH_TOKEN
+        });
+        console.log(`[Database] 🚀 Connecting to Turso SQLite Cloud...`);
+      } else {
+        const dbPath = path.resolve(process.cwd(), "local.db");
+        client = createClient({ url: `file:${dbPath}` });
+        console.log(`[Database] ✅ Local SQLite ready → ${dbPath}`);
+      }
 
       await initSqliteTables(client);
       _db = drizzle(client);
 
-      console.log(`[Database] ✅ SQLite ready → ${dbPath}`);
+      if (useTurso) console.log(`[Database] ✅ Turso connected successfully!`);
       return _db;
     } catch (err) {
-      console.error("[Database] SQLite init failed:", err);
+      console.error("[Database] SQLite/Turso init failed:", err);
       _db = null;
       return null;
     }
