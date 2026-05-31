@@ -125,7 +125,16 @@ class SDKServer {
     code: string,
     state: string
   ): Promise<ExchangeTokenResponse> {
-    return this.oauthService.getTokenByCode(code, state);
+    // If an external OAuth server is configured, use it. Otherwise fall back to GitHub directly.
+    if (ENV.oAuthServerUrl) {
+      return this.oauthService.getTokenByCode(code, state);
+    }
+    // Prefer Google if configured, else fallback to GitHub
+    if (ENV.googleClientId && ENV.googleClientSecret) {
+      return this.exchangeCodeWithGoogle(code, state);
+    }
+
+    return this.exchangeCodeWithGitHub(code, state);
   }
 
   /**
@@ -134,18 +143,160 @@ class SDKServer {
    * const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
    */
   async getUserInfo(accessToken: string): Promise<GetUserInfoResponse> {
-    const data = await this.oauthService.getUserInfoByToken({
-      accessToken,
-    } as ExchangeTokenResponse);
-    const loginMethod = this.deriveLoginMethod(
-      (data as any)?.platforms,
-      (data as any)?.platform ?? data.platform ?? null
+    if (ENV.oAuthServerUrl) {
+      const data = await this.oauthService.getUserInfoByToken({
+        accessToken,
+      } as ExchangeTokenResponse);
+      const loginMethod = this.deriveLoginMethod(
+        (data as any)?.platforms,
+        (data as any)?.platform ?? data.platform ?? null
+      );
+      return {
+        ...(data as any),
+        platform: loginMethod,
+        loginMethod,
+      } as GetUserInfoResponse;
+    }
+
+    // Prefer Google if configured, else fallback to GitHub
+    if (ENV.googleClientId && ENV.googleClientSecret) {
+      return this.getUserInfoFromGoogle(accessToken);
+    }
+
+    return this.getUserInfoFromGitHub(accessToken);
+  }
+
+  private async exchangeCodeWithGitHub(
+    code: string,
+    state: string
+  ): Promise<ExchangeTokenResponse> {
+    if (!ENV.githubClientId || !ENV.githubClientSecret) {
+      throw new Error("GitHub OAuth not configured (GITHUB_CLIENT_ID/GITHUB_CLIENT_SECRET missing)");
+    }
+
+    // Prefer explicit callback URL, else decode state for redirectUri if provided
+    const redirectUri = ENV.githubCallbackUrl || (state ? atob(state) : undefined);
+
+    const resp = await axios.post(
+      "https://github.com/login/oauth/access_token",
+      {
+        client_id: ENV.githubClientId,
+        client_secret: ENV.githubClientSecret,
+        code,
+        redirect_uri: redirectUri,
+      },
+      { headers: { Accept: "application/json" } }
     );
-    return {
-      ...(data as any),
-      platform: loginMethod,
-      loginMethod,
-    } as GetUserInfoResponse;
+
+    const data = resp.data as any;
+    if (!data || !data.access_token) {
+      throw new Error("Failed to exchange code for GitHub access token");
+    }
+
+    return ({ accessToken: data.access_token } as unknown) as ExchangeTokenResponse;
+  }
+
+  private async getUserInfoFromGitHub(accessToken: string): Promise<GetUserInfoResponse> {
+    const headers = {
+      Authorization: `token ${accessToken}`,
+      Accept: "application/json",
+      "User-Agent": "emploi-maroc-ia",
+    };
+
+    const userResp = await axios.get("https://api.github.com/user", { headers });
+    const user = userResp.data as any;
+
+    // Try to fetch primary/verified email
+    let email: string | null = null;
+    try {
+      const emailsResp = await axios.get("https://api.github.com/user/emails", { headers });
+      const emails = emailsResp.data as Array<any>;
+      if (Array.isArray(emails)) {
+        const primary = emails.find((e) => e.primary && e.verified) || emails.find((e) => e.verified) || emails[0];
+        if (primary && primary.email) email = primary.email;
+      }
+    } catch (err) {
+      // ignore email fetch errors
+    }
+
+    const openId = user.id ? `github:${user.id}` : `github:${user.login}`;
+
+    const result: any = {
+      openId,
+      name: user.name || user.login || null,
+      email: email ?? user.email ?? null,
+      platform: "github",
+      loginMethod: "github",
+    };
+
+    return result as GetUserInfoResponse;
+  }
+
+  private async exchangeCodeWithGoogle(
+    code: string,
+    state: string
+  ): Promise<ExchangeTokenResponse> {
+    if (!ENV.googleClientId || !ENV.googleClientSecret) {
+      throw new Error("Google OAuth not configured (GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET missing)");
+    }
+
+    let redirectUri: string | undefined = ENV.googleCallbackUrl;
+    if (!redirectUri && state) {
+      try {
+        redirectUri = atob(state);
+        console.log("[OAuth] Decoded redirect URI from state:", redirectUri);
+      } catch (err) {
+        console.error("[OAuth] Failed to decode state:", err);
+        throw new Error("Invalid state encoding");
+      }
+    }
+
+    if (!redirectUri) {
+      throw new Error("redirect_uri not configured: set GOOGLE_CALLBACK_URL env var or pass state");
+    }
+
+    console.log("[OAuth] Using redirect_uri for Google:", redirectUri);
+
+    const params = new URLSearchParams();
+    params.set("code", code);
+    params.set("client_id", ENV.googleClientId);
+    params.set("client_secret", ENV.googleClientSecret);
+    params.set("redirect_uri", redirectUri);
+    params.set("grant_type", "authorization_code");
+
+    console.log("[OAuth] Posting to Google token endpoint with code:", code.substring(0, 20) + "...");
+
+    const resp = await axios.post("https://oauth2.googleapis.com/token", params.toString(), {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+
+    const data = resp.data as any;
+    if (!data || !data.access_token) {
+      throw new Error("Failed to exchange code for Google access token");
+    }
+
+    return ({ accessToken: data.access_token } as unknown) as ExchangeTokenResponse;
+  }
+
+  private async getUserInfoFromGoogle(accessToken: string): Promise<GetUserInfoResponse> {
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    const userResp = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", { headers });
+    const profile = userResp.data as any;
+
+    const openId = profile.sub ? `google:${profile.sub}` : `google:${profile.email}`;
+
+    const result: any = {
+      openId,
+      name: profile.name || profile.email || null,
+      email: profile.email || null,
+      platform: "google",
+      loginMethod: "google",
+    };
+
+    return result as GetUserInfoResponse;
   }
 
   private parseCookies(cookieHeader: string | undefined) {
