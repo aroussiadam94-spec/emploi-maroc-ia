@@ -46,8 +46,11 @@ export function registerOAuthRoutes(app: Express) {
 
       res.redirect(302, "/");
     } catch (error) {
-      console.error("[OAuth] Callback failed", error);
-      res.status(500).json({ error: "OAuth callback failed" });
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error("[OAuth] Callback failed:", errorMsg);
+      console.error("[OAuth] Code:", code?.substring(0, 20) + "...");
+      console.error("[OAuth] State:", state?.substring(0, 20) + "...");
+      res.status(500).json({ error: "OAuth callback failed", detail: errorMsg });
     }
   });
   app.get("/api/oauth/mock-login", async (req: Request, res: Response) => {
