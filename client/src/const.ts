@@ -18,6 +18,12 @@ export const getLoginUrl = () => {
       url.searchParams.set("scope", "openid email profile");
       url.searchParams.set("state", state);
       url.searchParams.set("prompt", "select_account");
+      console.log("[OAuth] login URL generated", {
+        provider: "google",
+        clientId: googleClientId,
+        redirectUri,
+        url: url.toString(),
+      });
       return url.toString();
     }
 
