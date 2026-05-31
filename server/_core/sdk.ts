@@ -125,15 +125,25 @@ class SDKServer {
     code: string,
     state: string
   ): Promise<ExchangeTokenResponse> {
+    console.log("[OAuth] exchangeCodeForToken called");
+    console.log("[OAuth] ENV.oAuthServerUrl:", !!ENV.oAuthServerUrl);
+    console.log("[OAuth] ENV.googleClientId:", !!ENV.googleClientId);
+    console.log("[OAuth] ENV.googleClientSecret:", !!ENV.googleClientSecret);
+    console.log("[OAuth] ENV.githubClientId:", !!ENV.githubClientId);
+    console.log("[OAuth] ENV.githubClientSecret:", !!ENV.githubClientSecret);
+
     // If an external OAuth server is configured, use it. Otherwise fall back to GitHub directly.
     if (ENV.oAuthServerUrl) {
+      console.log("[OAuth] Using external OAuth server");
       return this.oauthService.getTokenByCode(code, state);
     }
     // Prefer Google if configured, else fallback to GitHub
     if (ENV.googleClientId && ENV.googleClientSecret) {
+      console.log("[OAuth] Using Google OAuth");
       return this.exchangeCodeWithGoogle(code, state);
     }
 
+    console.log("[OAuth] Falling back to GitHub OAuth");
     return this.exchangeCodeWithGitHub(code, state);
   }
 
