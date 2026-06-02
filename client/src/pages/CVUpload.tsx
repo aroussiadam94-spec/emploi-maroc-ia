@@ -1,15 +1,10 @@
 import { useState, useCallback } from "react";
 import { useLocation } from "wouter";
-import { UploadCloud, FileText, CheckCircle, AlertTriangle, X, Bot, ArrowRight, Loader2, Star, Target, Zap, UserRound } from "lucide-react";
+import { UploadCloud, FileText, CheckCircle, AlertTriangle, X, Bot, ArrowRight, Loader2, Star, Target, Zap, UserRound, ArrowLeft } from "lucide-react";
 import { useDropzone } from "react-dropzone";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import BrandLogo from "@/components/BrandLogo";
-import ThemeToggle from "@/components/ThemeToggle";
 
 const CV_ANALYSIS_PROMPT = (fileName: string) => `
 Tu es un expert RH et recruteur senior spécialisé dans le marché de l'emploi marocain.
@@ -44,7 +39,6 @@ export default function CVUpload() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [analyzingFileName, setAnalyzingFileName] = useState<string>("");
 
-  // Check if user has a CV saved in their profile
   const { data: profile, isLoading: profileLoading } = trpc.candidate.getProfile.useQuery();
   const profileCvFileName = (profile as any)?.cvFileName as string | null | undefined;
   const profileCvUrl = (profile as any)?.cvUrl as string | null | undefined;
@@ -70,7 +64,6 @@ export default function CVUpload() {
     setUploadProgress(0);
 
     try {
-      // Simulate upload progress bar
       const interval = setInterval(() => {
         setUploadProgress(prev => {
           if (prev >= 100) { clearInterval(interval); return 100; }
@@ -81,11 +74,10 @@ export default function CVUpload() {
       clearInterval(interval);
       setUploadProgress(100);
 
-      // Analyze with puter.js
       setStep("analyzing");
 
       if (!(window as any).puter?.ai) {
-        throw new Error("L'assistant IA (puter.js) n'est pas chargé. Veuillez rafraîchir la page.");
+        throw new Error("L'assistant IA (puter.js) n'est pas chargé.");
       }
 
       const response = await (window as any).puter.ai.chat(CV_ANALYSIS_PROMPT(fileName), {
@@ -104,7 +96,6 @@ export default function CVUpload() {
       toast.success("Analyse terminée avec succès !");
     } catch (error: any) {
       console.error(error);
-      // Always show a fallback result so the user gets value
       setAnalysisResult({
         atsScore: 68,
         overallGrade: "C",
@@ -133,285 +124,341 @@ export default function CVUpload() {
     setAnalyzingFileName("");
   };
 
-  // Is there an ongoing analysis (from profile or uploaded file)?
   const isProcessing = step === "uploading" || step === "analyzing";
 
   return (
-    <div className="app-shell min-h-screen">
+    <div className="app-shell min-h-screen" style={{ background: "#07090F" }}>
       {/* Header */}
-      <div className="border-b border-white/70 bg-white/80 backdrop-blur-xl">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
+        <div className="container py-5 flex items-center justify-between">
           <BrandLogo onClick={() => navigate("/")} />
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <button onClick={() => navigate("/search")} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/search")}
+              className="text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+            >
               Recherche
             </button>
-            <button onClick={() => navigate("/dashboard")} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors">
-              Tableau de bord
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+            >
+              Dashboard
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <main className="container max-w-5xl mx-auto py-12 px-4 sm:px-6">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-slate-900 mb-4">Analyse IA de votre CV</h1>
-          <p className="text-slate-600 max-w-2xl mx-auto">
-            Obtenez un score ATS, identifiez vos points forts et recevez des conseils personnalisés pour le marché de l'emploi marocain.
-          </p>
-        </div>
+      <main className="container max-w-5xl py-12">
+        {step !== "result" && (
+          <div className="text-center mb-10">
+            <span className="badge-gold mb-4 inline-flex">
+              <Bot size={11} /> Analyse IA
+            </span>
+            <h1
+              className="text-4xl font-black text-[#F0EDE6] md:text-5xl"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            >
+              Analysez votre CV
+            </h1>
+            <p className="mt-4 text-[#8B7D6B] max-w-2xl mx-auto">
+              Obtenez un score ATS, identifiez vos points forts et recevez des conseils personnalisés pour le marché de l'emploi marocain.
+            </p>
+          </div>
+        )}
 
         {step !== "result" ? (
-          <div className="max-w-2xl mx-auto space-y-4">
+          <div className="max-w-2xl mx-auto space-y-6">
 
-            {/* ── Profile CV banner ── */}
+            {/* Profile CV */}
             {!profileLoading && profileCvFileName && profileCvUrl && !isProcessing && !file && (
-              <Card className="border-indigo-200 bg-gradient-to-r from-indigo-50 to-violet-50 shadow-md">
-                <CardContent className="p-5 flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center shrink-0">
-                    <UserRound className="w-5 h-5 text-indigo-600" />
+              <div
+                className="rounded-2xl p-6"
+                style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.20)" }}
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className="flex h-12 w-12 items-center justify-center rounded-xl"
+                      style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}
+                    >
+                      <UserRound size={22} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-[#F0EDE6]">CV enregistré dans votre profil</p>
+                      <p className="text-sm text-[#8B7D6B] truncate max-w-[200px] sm:max-w-xs">{profileCvFileName}</p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-indigo-900">CV enregistré dans votre profil</p>
-                    <p className="text-xs text-indigo-600 truncate">{profileCvFileName}</p>
-                  </div>
-                  <Button
+                  <button
                     onClick={() => runAnalysis(profileCvFileName)}
-                    className="shrink-0 bg-indigo-600 hover:bg-indigo-700 gap-2"
-                    size="sm"
+                    className="btn-gold rounded-xl px-5 py-2.5 text-sm w-full sm:w-auto flex justify-center"
                   >
-                    <Bot className="w-4 h-4" />
-                    Analyser ce CV
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* ── Loading: profile not loaded yet ── */}
-            {profileLoading && (
-              <div className="flex justify-center py-4">
-                <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+                    <Bot size={15} /> Analyser ce CV
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* ── Main upload / progress card ── */}
-            <Card className="border-0 shadow-xl shadow-indigo-100/50">
-              <CardContent className="p-8">
-                {/* No file selected and not processing */}
-                {!file && !isProcessing ? (
-                  <>
-                    {profileCvFileName && (
-                      <p className="text-center text-sm text-slate-400 mb-5">— ou analyser un autre fichier —</p>
-                    )}
+            {profileLoading && (
+              <div className="flex justify-center py-6">
+                <Loader2 className="w-8 h-8 text-[#C9A84C] animate-spin" />
+              </div>
+            )}
+
+            {/* Upload Box */}
+            <div
+              className="rounded-3xl p-8"
+              style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}
+            >
+              {!file && !isProcessing ? (
+                <>
+                  {profileCvFileName && (
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="h-px flex-1 bg-[rgba(201,168,76,0.1)]"></div>
+                      <span className="text-xs font-bold uppercase tracking-widest text-[#8B7D6B]">OU NOUVEAU FICHIER</span>
+                      <div className="h-px flex-1 bg-[rgba(201,168,76,0.1)]"></div>
+                    </div>
+                  )}
+                  <div
+                    {...getRootProps()}
+                    className="rounded-2xl p-12 text-center cursor-pointer transition-all border-2 border-dashed"
+                    style={{
+                      borderColor: isDragActive ? "rgba(201,168,76,0.6)" : "rgba(201,168,76,0.2)",
+                      background: isDragActive ? "rgba(201,168,76,0.05)" : "transparent",
+                    }}
+                  >
+                    <input {...getInputProps()} />
                     <div
-                      {...getRootProps()}
-                      className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-200 ${
-                        isDragActive
-                          ? "border-indigo-500 bg-indigo-50/50"
-                          : "border-slate-200 hover:border-indigo-300 hover:bg-slate-50"
-                      }`}
+                      className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+                      style={{ background: "rgba(201,168,76,0.10)", color: "#C9A84C" }}
                     >
-                      <input {...getInputProps()} />
-                      <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <UploadCloud className="w-8 h-8 text-indigo-600" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                        {profileCvFileName ? "Télécharger un autre CV" : "Glissez-déposez votre CV ici"}
-                      </h3>
-                      <p className="text-slate-500 text-sm mb-6">PDF, DOC ou DOCX · Max. 5 MB</p>
-                      <Button variant="outline" className="rounded-full pointer-events-none">
-                        Parcourir les fichiers
-                      </Button>
+                      <UploadCloud size={28} />
                     </div>
-                  </>
-                ) : (
-                  <div className="space-y-6">
-                    {/* File/CV preview */}
-                    <div className="bg-slate-50 rounded-xl p-4 flex items-center gap-4 border border-slate-100">
-                      <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center shrink-0">
-                        <FileText className="w-6 h-6 text-indigo-600" />
+                    <h3 className="text-lg font-bold text-[#F0EDE6] mb-2" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                      {profileCvFileName ? "Télécharger un autre CV" : "Glissez-déposez votre CV ici"}
+                    </h3>
+                    <p className="text-sm text-[#8B7D6B] mb-6">PDF, DOC ou DOCX · Max. 5 MB</p>
+                    <button className="btn-outline-gold rounded-xl px-6 py-2.5 text-sm pointer-events-none">
+                      Parcourir les fichiers
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-6">
+                  {/* File preview */}
+                  <div
+                    className="flex items-center justify-between rounded-2xl p-5"
+                    style={{ background: "rgba(201,168,76,0.04)", border: "1px solid rgba(201,168,76,0.15)" }}
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>
+                        <FileText size={20} />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-900 truncate">
-                          {file?.name || analyzingFileName}
-                        </p>
-                        {file && (
-                          <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                        )}
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-[#F0EDE6] truncate">{file?.name || analyzingFileName}</p>
+                        {file && <p className="text-xs text-[#8B7D6B]">{(file.size / 1024 / 1024).toFixed(2)} MB</p>}
                       </div>
-                      {step === "idle" && file && (
-                        <button onClick={() => setFile(null)} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                          <X className="w-5 h-5" />
-                        </button>
-                      )}
                     </div>
-
-                    {step === "uploading" && (
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-slate-600">Préparation de l'analyse...</span>
-                          <span className="font-medium text-indigo-600">{uploadProgress}%</span>
-                        </div>
-                        <Progress value={uploadProgress} className="h-2" />
-                      </div>
-                    )}
-
-                    {step === "analyzing" && (
-                      <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-6 text-center space-y-4">
-                        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto" />
-                        <div>
-                          <p className="font-medium text-indigo-900">Analyse IA en cours</p>
-                          <p className="text-sm text-indigo-600/80 mt-1">L'assistant RH examine votre profil pour le marché marocain...</p>
-                        </div>
-                      </div>
-                    )}
-
                     {step === "idle" && file && (
-                      <div className="flex justify-end gap-3 pt-4 border-t">
-                        <Button variant="ghost" onClick={() => setFile(null)}>Annuler</Button>
-                        <Button onClick={() => runAnalysis(file.name)} className="gap-2">
-                          <Bot className="w-4 h-4" />
-                          Analyser mon CV
-                        </Button>
-                      </div>
+                      <button onClick={() => setFile(null)} className="shrink-0 p-2 text-[#8B7D6B] hover:text-[#E07A5F] transition-colors rounded-lg hover:bg-[rgba(224,122,95,0.1)]">
+                        <X size={18} />
+                      </button>
                     )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
+
+                  {/* Uploading */}
+                  {step === "uploading" && (
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm font-semibold">
+                        <span className="text-[#8B7D6B]">Préparation de l'analyse...</span>
+                        <span className="text-[#C9A84C]">{uploadProgress}%</span>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-[rgba(201,168,76,0.1)]">
+                        <div className="h-full bg-[#C9A84C] transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Analyzing */}
+                  {step === "analyzing" && (
+                    <div className="rounded-2xl p-8 text-center" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.20)" }}>
+                      <Loader2 size={36} className="mx-auto mb-4 animate-spin text-[#C9A84C]" />
+                      <p className="text-lg font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Analyse IA en cours</p>
+                      <p className="mt-2 text-sm text-[#8B7D6B]">L'assistant RH examine votre profil pour le marché marocain...</p>
+                    </div>
+                  )}
+
+                  {/* Ready to analyze */}
+                  {step === "idle" && file && (
+                    <div className="flex justify-end gap-3 pt-4 border-t border-[rgba(201,168,76,0.1)]">
+                      <button onClick={() => setFile(null)} className="rounded-xl px-5 py-2.5 text-sm font-medium text-[#8B7D6B] hover:text-[#F0EDE6]">
+                        Annuler
+                      </button>
+                      <button onClick={() => runAnalysis(file.name)} className="btn-gold rounded-xl px-6 py-2.5 text-sm">
+                        <Bot size={15} /> Analyser mon CV
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           /* ── Results ── */
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="space-y-8 reveal" style={{ animation: "rise-in 600ms cubic-bezier(0.22,1,0.36,1) both" }}>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-3xl font-black text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                  Résultat de l'analyse
+                </h1>
+                {analyzingFileName && <p className="text-sm text-[#8B7D6B] mt-1">Fichier : {analyzingFileName}</p>}
+              </div>
+              <button onClick={reset} className="btn-outline-gold rounded-xl px-4 py-2 text-sm flex items-center gap-2">
+                <ArrowLeft size={14} /> Nouveau CV
+              </button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="border-0 shadow-lg md:col-span-1 bg-gradient-to-br from-indigo-600 to-violet-700 text-white">
-                <CardContent className="p-8 text-center flex flex-col items-center justify-center h-full">
-                  <p className="text-indigo-100 mb-2 font-medium">Score ATS Global</p>
-                  <div className="text-6xl font-bold mb-2 flex items-baseline justify-center gap-1">
-                    {analysisResult.atsScore}
-                    <span className="text-2xl text-indigo-200">/100</span>
+              {/* Score Card */}
+              <div
+                className="rounded-3xl p-8 text-center flex flex-col items-center justify-center md:col-span-1 relative overflow-hidden"
+                style={{ background: "#C9A84C", boxShadow: "0 20px 60px rgba(201,168,76,0.25)" }}
+              >
+                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,black_0%,transparent_100%)]"></div>
+                <div className="relative z-10 text-[#07090F]">
+                  <p className="font-bold uppercase tracking-widest text-xs opacity-80 mb-3">Score ATS Global</p>
+                  <div className="text-7xl font-black tracking-tighter mb-2" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                    {analysisResult.atsScore}<span className="text-3xl opacity-60">/100</span>
                   </div>
-                  <div className="mt-4 inline-flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="mt-4 inline-flex items-center gap-1.5 bg-[#07090F]/10 px-4 py-1.5 rounded-full text-sm font-black uppercase">
                     Grade {analysisResult.overallGrade}
                   </div>
-                  {analyzingFileName && (
-                    <p className="text-indigo-200 text-xs mt-4 truncate max-w-full px-2">{analyzingFileName}</p>
-                  )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card className="border-0 shadow-lg md:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Bot className="w-5 h-5 text-indigo-600" />
-                    Résumé du profil
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600 leading-relaxed">{analysisResult.summary}</p>
-                  <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
-                    <h4 className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2">
-                      <Target className="w-4 h-4 text-indigo-500" />
-                      Aperçu du marché marocain
-                    </h4>
-                    <p className="text-sm text-slate-600">{analysisResult.marketInsights}</p>
+              {/* Summary Card */}
+              <div
+                className="rounded-3xl p-8 md:col-span-2"
+                style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)" }}
+              >
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>
+                    <Bot size={18} />
                   </div>
-                </CardContent>
-              </Card>
+                  <h2 className="text-xl font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                    Résumé du profil
+                  </h2>
+                </div>
+                <p className="text-base leading-relaxed text-[#8B7D6B] mb-6">{analysisResult.summary}</p>
+                
+                <div className="rounded-2xl p-5" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}>
+                  <h4 className="text-sm font-bold text-[#F0EDE6] mb-2 flex items-center gap-2">
+                    <Target size={16} className="text-[#C9A84C]" />
+                    Aperçu du marché marocain
+                  </h4>
+                  <p className="text-sm leading-relaxed text-[#8B7D6B]">{analysisResult.marketInsights}</p>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Star className="w-5 h-5 text-emerald-500" />
-                    Points Forts
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {analysisResult.strengths.map((s: string, i: number) => (
-                      <li key={i} className="flex items-start gap-3 text-slate-600">
-                        <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                        <span>{s}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              {/* Strengths */}
+              <div className="rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(52,211,153,0.2)" }}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(52,211,153,0.15)", color: "#34D399" }}>
+                    <Star size={18} />
+                  </div>
+                  <h2 className="text-xl font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Points Forts</h2>
+                </div>
+                <ul className="space-y-4">
+                  {analysisResult.strengths.map((s: string, i: number) => (
+                    <li key={i} className="flex items-start gap-3 text-[#8B7D6B]">
+                      <CheckCircle size={18} className="text-[#34D399] shrink-0 mt-0.5" />
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-amber-500" />
-                    Points à Améliorer
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {analysisResult.weaknesses.map((w: string, i: number) => (
-                      <li key={i} className="flex items-start gap-3 text-slate-600">
-                        <Zap className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                        <span>{w}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              {/* Weaknesses */}
+              <div className="rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(224,122,95,0.2)" }}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(224,122,95,0.15)", color: "#E07A5F" }}>
+                    <AlertTriangle size={18} />
+                  </div>
+                  <h2 className="text-xl font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Points à Améliorer</h2>
+                </div>
+                <ul className="space-y-4">
+                  {analysisResult.weaknesses.map((w: string, i: number) => (
+                    <li key={i} className="flex items-start gap-3 text-[#8B7D6B]">
+                      <Zap size={18} className="text-[#E07A5F] shrink-0 mt-0.5" />
+                      <span>{w}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle>Recommandations d'Amélioration</CardTitle>
-                <CardDescription>Actions prioritaires pour booster votre profil</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                  {analysisResult.tips.map((tip: any, i: number) => (
-                    <div key={i} className="bg-white border rounded-xl p-5 shadow-sm">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-semibold text-slate-900">{tip.title}</h4>
-                        <Badge variant={tip.priority === "high" ? "destructive" : "secondary"}>
-                          {tip.priority === "high" ? "Priorité Haute" : "Conseillé"}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-slate-600">{tip.description}</p>
-                    </div>
-                  ))}
-                </div>
+            {/* Recommendations */}
+            <div className="rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)" }}>
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Recommandations d'Amélioration</h2>
+                <p className="text-sm text-[#8B7D6B] mt-1">Actions prioritaires pour booster votre profil</p>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
-                    <h4 className="font-medium text-slate-900 mb-3">Sections Manquantes</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {analysisResult.missingSections.length > 0 ? (
-                        analysisResult.missingSections.map((s: string, i: number) => (
-                          <Badge key={i} variant="outline" className="bg-red-50 text-red-700 border-red-200">+ {s}</Badge>
-                        ))
-                      ) : (
-                        <span className="text-sm text-slate-500">Aucune section importante manquante.</span>
-                      )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+                {analysisResult.tips.map((tip: any, i: number) => (
+                  <div key={i} className="rounded-2xl p-6" style={{ background: "rgba(201,168,76,0.04)", border: "1px solid rgba(201,168,76,0.1)" }}>
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <h4 className="font-bold text-[#F0EDE6] leading-tight">{tip.title}</h4>
+                      <span
+                        className="shrink-0 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg"
+                        style={{
+                          background: tip.priority === "high" ? "rgba(224,122,95,0.15)" : "rgba(201,168,76,0.15)",
+                          color: tip.priority === "high" ? "#E07A5F" : "#C9A84C",
+                        }}
+                      >
+                        {tip.priority === "high" ? "Haute" : "Conseillé"}
+                      </span>
                     </div>
+                    <p className="text-sm text-[#8B7D6B] leading-relaxed">{tip.description}</p>
                   </div>
-                  <div>
-                    <h4 className="font-medium text-slate-900 mb-3">Compétences Suggérées</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {analysisResult.skillsToAdd.map((s: string, i: number) => (
-                        <Badge key={i} variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100">{s}</Badge>
-                      ))}
-                    </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-[rgba(201,168,76,0.1)] pt-8">
+                <div>
+                  <h4 className="text-xs font-black tracking-widest uppercase text-[#C9A84C] mb-4">Sections Manquantes</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {analysisResult.missingSections.length > 0 ? (
+                      analysisResult.missingSections.map((s: string, i: number) => (
+                        <span key={i} className="rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(224,122,95,0.1)", color: "#E07A5F", border: "1px solid rgba(224,122,95,0.2)" }}>
+                          + {s}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-[#8B7D6B]">Aucune section importante manquante.</span>
+                    )}
                   </div>
                 </div>
-              </CardContent>
-              <CardFooter className="bg-slate-50 rounded-b-xl border-t p-6 flex justify-between items-center flex-wrap gap-3">
-                <Button variant="outline" onClick={reset}>Analyser un autre CV</Button>
-                <Button onClick={() => navigate("/dashboard")} className="gap-2">
-                  Aller au Tableau de Bord
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </CardFooter>
-            </Card>
+                <div>
+                  <h4 className="text-xs font-black tracking-widest uppercase text-[#C9A84C] mb-4">Compétences Suggérées</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {analysisResult.skillsToAdd.map((s: string, i: number) => (
+                      <span key={i} className="rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-center pb-8">
+               <button onClick={() => navigate("/dashboard")} className="btn-gold rounded-xl px-8 py-4 text-base">
+                Aller au Tableau de Bord <ArrowRight size={18} />
+              </button>
+            </div>
           </div>
         )}
       </main>

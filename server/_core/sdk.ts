@@ -94,6 +94,7 @@ class SDKServer {
     this.oauthService = new OAuthService(this.client);
   }
 
+
   private deriveLoginMethod(
     platforms: unknown,
     fallback: string | null | undefined
@@ -267,6 +268,7 @@ class SDKServer {
 
     console.log("[OAuth] Using redirect_uri for Google:", redirectUri);
 
+  
     const params = new URLSearchParams();
     params.set("code", code);
     params.set("client_id", ENV.googleClientId);

@@ -40,11 +40,20 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider
-        defaultTheme="light"
-        switchable
+        defaultTheme="dark"
+        switchable={false}
       >
         <TooltipProvider>
-          <Toaster />
+          <Toaster
+            theme="dark"
+            toastOptions={{
+              style: {
+                background: "#0E1020",
+                border: "1px solid rgba(201,168,76,0.20)",
+                color: "#F0EDE6",
+              },
+            }}
+          />
           <Router />
           <ChatBot />
         </TooltipProvider>

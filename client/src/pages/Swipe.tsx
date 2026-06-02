@@ -1,14 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Briefcase, MapPin, Building2, ExternalLink, RefreshCw, X, Heart, Loader2, Sparkles } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Briefcase, MapPin, Building2, ExternalLink, RefreshCw, X, Heart, Loader2, Sparkles, ArrowLeft } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
-import ThemeToggle from "@/components/ThemeToggle";
 
 interface SwipeJob {
   id: number;
@@ -28,7 +24,6 @@ export default function Swipe() {
   const [, navigate] = useLocation();
   const utils = trpc.useUtils();
   
-  // Fetch jobs
   const { data: jobsResponse, isLoading, refetch } = trpc.jobs.getSwipeJobs.useQuery({ limit: 15 });
   const applyMutation = trpc.jobs.submitApplication.useMutation();
 
@@ -37,18 +32,15 @@ export default function Swipe() {
   const [matchScore, setMatchScore] = useState<{ score: number; reason: string } | null>(null);
   const [isScoring, setIsScoring] = useState(false);
 
-  // Framer motion values for the top card
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 300], [-20, 20]);
   const opacity = useTransform(x, [-300, -200, 0, 200, 300], [0, 1, 1, 1, 0]);
 
-  // Icons opacity based on drag direction
   const likeOpacity = useTransform(x, [0, 150], [0, 1]);
   const nopeOpacity = useTransform(x, [0, -150], [0, 1]);
 
   useEffect(() => {
     if (jobsResponse) {
-      // Filter out previously swiped jobs from localStorage
       const swiped = JSON.parse(localStorage.getItem("swiped_jobs") || "[]");
       const filtered = jobsResponse.filter((j: any) => !swiped.includes(j.id));
       setJobs(filtered);
@@ -59,7 +51,6 @@ export default function Swipe() {
   const currentJob = jobs[currentIndex];
 
   useEffect(() => {
-    // Generate AI Match Score when current job changes
     if (currentJob) {
       generateMatchScore(currentJob);
     } else {
@@ -75,9 +66,7 @@ export default function Swipe() {
         throw new Error("Puter AI non disponible");
       }
 
-      // Mock user profile summary for the demo
       const userProfile = "Développeur avec 3 ans d'expérience en React, Node.js et TypeScript.";
-      
       const prompt = `
 Tu es un recruteur expert. Analyse la compatibilité entre ce profil et cette offre d'emploi.
 Profil: "${userProfile}"
@@ -94,7 +83,6 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
 
       setMatchScore({ score: result.score || 50, reason: result.reason || "Correspondance moyenne." });
     } catch (error) {
-      // Fallback
       setMatchScore({ score: Math.floor(Math.random() * 40) + 50, reason: "Analyse générée par le système par défaut." });
     } finally {
       setIsScoring(false);
@@ -102,7 +90,6 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
   };
 
   const handleSwipe = async (direction: "left" | "right", job: SwipeJob) => {
-    // Save to local storage to prevent showing again
     const swiped = JSON.parse(localStorage.getItem("swiped_jobs") || "[]");
     localStorage.setItem("swiped_jobs", JSON.stringify([...swiped, job.id]));
 
@@ -117,7 +104,7 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
     }
 
     setCurrentIndex(prev => prev + 1);
-    x.set(0); // reset position
+    x.set(0);
   };
 
   const onDragEnd = (e: any, info: any) => {
@@ -126,14 +113,11 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
       handleSwipe("right", currentJob);
     } else if (info.offset.x < -SWIPE_THRESHOLD) {
       handleSwipe("left", currentJob);
-    } else {
-      // Snap back
     }
   };
 
   const manualSwipe = (direction: "left" | "right") => {
     if (!currentJob) return;
-    // Animate out
     x.set(direction === "right" ? 500 : -500);
     setTimeout(() => {
       handleSwipe(direction, currentJob);
@@ -141,43 +125,50 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center overflow-hidden">
+    <div className="app-shell flex h-screen flex-col overflow-hidden" style={{ background: "#07090F" }}>
       {/* Header */}
-      <div className="w-full px-6 py-4 flex items-center justify-between border-b border-slate-800 bg-slate-900/50 backdrop-blur-md z-10">
-        <BrandLogo onClick={() => navigate("/")} />
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <Badge variant="outline" className="border-indigo-500/30 text-indigo-300 bg-indigo-500/10">
-            Mode Swipe
-          </Badge>
+      <header className="nav-glass z-10 shrink-0" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
+        <div className="container flex items-center justify-between py-4">
+          <BrandLogo onClick={() => navigate("/")} />
+          <div className="flex items-center gap-4">
+            <span className="badge-gold inline-flex"><Sparkles size={11} /> Mode Swipe IA</span>
+            <button
+              onClick={() => navigate("/search")}
+              className="text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div className="flex-1 w-full max-w-md relative flex items-center justify-center p-4">
+      <div className="relative flex flex-1 min-h-0 items-center justify-center p-4">
         {isLoading ? (
-          <div className="flex flex-col items-center gap-4 text-indigo-300">
-            <Loader2 className="w-8 h-8 animate-spin" />
+          <div className="flex flex-col items-center gap-4 text-[#8B7D6B]">
+            <Loader2 size={32} className="animate-spin text-[#C9A84C]" />
             <p>Recherche des meilleures offres...</p>
           </div>
         ) : jobs.length === 0 || currentIndex >= jobs.length ? (
-          <div className="text-center text-slate-400 space-y-4">
-            <RefreshCw className="w-12 h-12 mx-auto text-slate-600 mb-4" />
-            <h2 className="text-xl font-bold text-slate-200">Plus d'offres disponibles</h2>
-            <p className="text-sm">Vous avez exploré toutes les offres suggérées.</p>
-            <Button onClick={() => refetch()} variant="outline" className="mt-4 border-slate-700 hover:bg-slate-800">
-              Rafraîchir les offres
-            </Button>
-            <Button onClick={() => navigate("/search")} className="mt-2 w-full">
-              Retour à la recherche
-            </Button>
+          <div className="rounded-3xl p-10 text-center" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)" }}>
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C" }}>
+              <RefreshCw size={28} />
+            </div>
+            <h2 className="mb-3 text-2xl font-black text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Plus d'offres disponibles</h2>
+            <p className="mb-8 text-sm text-[#8B7D6B]">Vous avez exploré toutes les offres suggérées.</p>
+            <div className="flex flex-col gap-3">
+              <button onClick={() => refetch()} className="btn-outline-gold w-full rounded-xl py-3 text-sm flex justify-center items-center gap-2">
+                <RefreshCw size={14} /> Rafraîchir les offres
+              </button>
+              <button onClick={() => navigate("/search")} className="btn-gold w-full rounded-xl py-3 text-sm">
+                Retour à la recherche
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="relative w-full h-[600px] max-h-[75vh]">
+          <div className="relative h-[650px] max-h-full w-full max-w-[420px]">
             <AnimatePresence>
               {jobs.slice(currentIndex, currentIndex + 3).reverse().map((job, idx, arr) => {
                 const isTop = idx === arr.length - 1;
-                
-                // Stack visual effect
                 const scale = isTop ? 1 : 1 - (arr.length - 1 - idx) * 0.05;
                 const yOffset = isTop ? 0 : (arr.length - 1 - idx) * 20;
 
@@ -195,26 +186,30 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
                     drag={isTop ? "x" : false}
                     dragConstraints={{ left: 0, right: 0 }}
                     onDragEnd={isTop ? onDragEnd : undefined}
-                    className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+                    className="absolute inset-0 cursor-grab active:cursor-grabbing"
                     initial={{ scale: 0.9, opacity: 0, y: 50 }}
                     animate={{ scale, opacity: 1, y: yOffset }}
                     exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
-                    <Card className="w-full h-full overflow-hidden flex flex-col bg-slate-900 border-slate-800 shadow-2xl relative group">
-                      
+                    <div
+                      className="pro-card flex h-full w-full flex-col overflow-hidden rounded-3xl"
+                      style={{ background: "#0E1020", border: "1px solid rgba(201,168,76,0.18)", boxShadow: "0 40px 80px rgba(0,0,0,0.6)" }}
+                    >
                       {/* Swipe Overlays */}
                       {isTop && (
                         <>
                           <motion.div 
                             style={{ opacity: likeOpacity }} 
-                            className="absolute top-8 left-8 z-20 border-4 border-emerald-500 text-emerald-500 rounded-lg px-4 py-2 font-black text-4xl uppercase tracking-widest rotate-[-15deg] bg-emerald-500/10 backdrop-blur-sm"
+                            className="absolute left-6 top-8 z-20 rounded-xl border-4 px-5 py-2 text-3xl font-black uppercase tracking-widest backdrop-blur-md"
+                            style={{ borderColor: "#34D399", color: "#34D399", background: "rgba(52,211,153,0.15)", rotate: "-15deg" }}
                           >
                             POSTULER
                           </motion.div>
                           <motion.div 
                             style={{ opacity: nopeOpacity }} 
-                            className="absolute top-8 right-8 z-20 border-4 border-rose-500 text-rose-500 rounded-lg px-4 py-2 font-black text-4xl uppercase tracking-widest rotate-[15deg] bg-rose-500/10 backdrop-blur-sm"
+                            className="absolute right-6 top-8 z-20 rounded-xl border-4 px-5 py-2 text-3xl font-black uppercase tracking-widest backdrop-blur-md"
+                            style={{ borderColor: "#E07A5F", color: "#E07A5F", background: "rgba(224,122,95,0.15)", rotate: "15deg" }}
                           >
                             PASSER
                           </motion.div>
@@ -222,72 +217,78 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
                       )}
 
                       {/* Header Image Gradient */}
-                      <div className="h-32 bg-gradient-to-br from-indigo-900 via-slate-800 to-slate-900 relative">
-                        <div className="absolute -bottom-10 left-6">
-                          <div className="w-20 h-20 rounded-2xl bg-slate-800 border-4 border-slate-900 flex items-center justify-center text-2xl font-bold text-slate-400 shadow-lg">
-                            {job.company.charAt(0)}
+                      <div className="relative h-36 shrink-0" style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(14,16,32,1) 100%)", borderBottom: "1px solid rgba(201,168,76,0.1)" }}>
+                        <div className="absolute -bottom-8 left-6">
+                          <div
+                            className="flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-black text-white shadow-xl"
+                            style={{ background: "#1a2e4a", border: "4px solid #0E1020", fontFamily: "'Playfair Display', Georgia, serif" }}
+                          >
+                            {job.company.charAt(0).toUpperCase()}
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex-1 p-6 pt-12 flex flex-col">
+                      <div className="flex flex-1 flex-col p-6 pt-12">
                         <div className="mb-4">
-                          <h2 className="text-2xl font-bold text-white mb-1 leading-tight">{job.title}</h2>
-                          <div className="flex items-center gap-2 text-indigo-300 font-medium">
-                            <Building2 className="w-4 h-4" />
-                            {job.company}
+                          <h2 className="mb-1 text-2xl font-bold leading-tight text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                            {job.title}
+                          </h2>
+                          <div className="flex items-center gap-2 font-medium text-[#8B7D6B]">
+                            <Building2 size={14} /> {job.company}
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 mb-6">
+                        <div className="mb-6 flex flex-wrap gap-2">
                           {job.location && (
-                            <Badge variant="secondary" className="bg-slate-800 text-slate-300 border-slate-700">
-                              <MapPin className="w-3 h-3 mr-1" />
-                              {job.location}
-                            </Badge>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[#1E2338] px-3 py-1 text-xs text-[#8B7D6B]">
+                              <MapPin size={11} /> {job.location}
+                            </span>
                           )}
                           {job.sector && (
-                            <Badge variant="secondary" className="bg-slate-800 text-slate-300 border-slate-700">
-                              <Briefcase className="w-3 h-3 mr-1" />
-                              {job.sector}
-                            </Badge>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[#1E2338] px-3 py-1 text-xs text-[#8B7D6B]">
+                              <Briefcase size={11} /> {job.sector}
+                            </span>
                           )}
                           {job.salaryMin && job.salaryMax && (
-                            <Badge variant="secondary" className="bg-emerald-900/30 text-emerald-400 border-emerald-800/50">
-                              {job.salaryMin} - {job.salaryMax} {job.currency}
-                            </Badge>
+                            <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "rgba(52,211,153,0.1)", color: "#34D399" }}>
+                              {job.salaryMin} - {job.salaryMax} {job.currency || "MAD"}
+                            </span>
                           )}
                         </div>
 
-                        <div className="flex-1 overflow-hidden relative">
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent z-10 bottom-0 h-20 top-auto"></div>
-                          <p className="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">
+                        <div className="relative flex-1 overflow-hidden">
+                          <div className="absolute bottom-0 z-10 h-16 w-full bg-gradient-to-t from-[#0E1020] to-transparent" />
+                          <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#8B7D6B]">
                             {job.description}
                           </p>
                         </div>
 
-                        {/* AI Match Score (Only on top card) */}
+                        {/* AI Match Score */}
                         {isTop && (
-                          <div className="mt-4 p-4 rounded-xl bg-slate-800/50 border border-slate-700 relative overflow-hidden">
-                            <div className="flex items-center gap-3 mb-2 relative z-10">
-                              <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0">
-                                <Sparkles className="w-5 h-5 text-indigo-400" />
+                          <div className="mt-4 shrink-0 rounded-2xl p-4" style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)" }}>
+                            <div className="mb-2 flex items-center gap-3">
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>
+                                <Sparkles size={18} />
                               </div>
                               <div className="flex-1">
-                                <div className="flex justify-between items-end">
-                                  <span className="text-sm font-medium text-slate-200">Match IA</span>
+                                <div className="flex items-end justify-between">
+                                  <span className="text-sm font-bold text-[#F0EDE6]">Match IA</span>
                                   {isScoring ? (
-                                    <Loader2 className="w-4 h-4 text-indigo-400 animate-spin" />
+                                    <Loader2 size={14} className="animate-spin text-[#C9A84C]" />
                                   ) : matchScore ? (
-                                    <span className={`text-lg font-bold ${matchScore.score >= 80 ? 'text-emerald-400' : matchScore.score >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>
+                                    <span
+                                      className="text-lg font-black"
+                                      style={{ color: matchScore.score >= 80 ? "#34D399" : matchScore.score >= 50 ? "#C9A84C" : "#E07A5F" }}
+                                    >
                                       {matchScore.score}%
                                     </span>
                                   ) : null}
                                 </div>
                                 {!isScoring && matchScore && (
-                                  <div className="w-full bg-slate-700 h-1.5 rounded-full mt-2 overflow-hidden">
+                                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[rgba(201,168,76,0.1)]">
                                     <motion.div 
-                                      className={`h-full ${matchScore.score >= 80 ? 'bg-emerald-500' : matchScore.score >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                                      className="h-full"
+                                      style={{ background: matchScore.score >= 80 ? "#34D399" : matchScore.score >= 50 ? "#C9A84C" : "#E07A5F" }}
                                       initial={{ width: 0 }}
                                       animate={{ width: `${matchScore.score}%` }}
                                       transition={{ duration: 1, ease: "easeOut" }}
@@ -297,14 +298,14 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
                               </div>
                             </div>
                             {!isScoring && matchScore && (
-                              <p className="text-xs text-slate-400 relative z-10 mt-3 leading-relaxed">
+                              <p className="mt-3 text-xs leading-relaxed text-[#8B7D6B]">
                                 {matchScore.reason}
                               </p>
                             )}
                           </div>
                         )}
                       </div>
-                    </Card>
+                    </div>
                   </motion.div>
                 );
               })}
@@ -315,28 +316,29 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
 
       {/* Action Buttons */}
       {jobs.length > 0 && currentIndex < jobs.length && (
-        <div className="flex items-center justify-center gap-6 pb-12 pt-4">
+        <div className="shrink-0 pb-10 pt-4 flex items-center justify-center gap-8">
           <button 
             onClick={() => manualSwipe("left")}
-            className="w-16 h-16 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/50 transition-colors shadow-xl"
+            className="flex h-16 w-16 items-center justify-center rounded-full transition-all hover:scale-105 active:scale-95"
+            style={{ background: "rgba(14,16,32,0.8)", border: "2px solid rgba(224,122,95,0.3)", color: "#E07A5F", boxShadow: "0 10px 25px rgba(224,122,95,0.15)" }}
           >
-            <X className="w-8 h-8" />
+            <X size={32} />
           </button>
           
           <button 
-            onClick={() => {
-              window.open(`/jobs/${currentJob?.id}`, "_blank");
-            }}
-            className="w-12 h-12 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-slate-300 hover:bg-slate-700 transition-colors shadow-xl"
+            onClick={() => window.open(`/jobs/${currentJob?.id}`, "_blank")}
+            className="flex h-12 w-12 items-center justify-center rounded-full transition-all hover:scale-105 active:scale-95"
+            style={{ background: "rgba(14,16,32,0.8)", border: "2px solid rgba(201,168,76,0.3)", color: "#C9A84C", boxShadow: "0 10px 25px rgba(201,168,76,0.1)" }}
           >
-            <ExternalLink className="w-5 h-5" />
+            <ExternalLink size={20} />
           </button>
 
           <button 
             onClick={() => manualSwipe("right")}
-            className="w-16 h-16 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-emerald-500 hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-colors shadow-xl"
+            className="flex h-16 w-16 items-center justify-center rounded-full transition-all hover:scale-105 active:scale-95"
+            style={{ background: "rgba(14,16,32,0.8)", border: "2px solid rgba(52,211,153,0.3)", color: "#34D399", boxShadow: "0 10px 25px rgba(52,211,153,0.15)" }}
           >
-            <Heart className="w-7 h-7 fill-emerald-500/20" />
+            <Heart size={28} className="fill-[#34D399]" />
           </button>
         </div>
       )}

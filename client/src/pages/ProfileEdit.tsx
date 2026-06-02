@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, UserRound, UploadCloud, FileText, X, Loader2, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, UserRound, UploadCloud, FileText, Loader2, Trash2 } from "lucide-react";
 import { useLocation } from "wouter"; 
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import BrandLogo from "@/components/BrandLogo";
-import ThemeToggle from "@/components/ThemeToggle";
 import { useDropzone } from "react-dropzone";
 
 export default function ProfileEdit() {
@@ -59,7 +54,6 @@ export default function ProfileEdit() {
     if (acceptedFiles.length === 0) return;
     const file = acceptedFiles[0];
 
-    // Simple extension check
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (!['pdf', 'doc', 'docx'].includes(ext || '')) {
       toast.error("Format non supporté. Veuillez utiliser un PDF ou DOC.");
@@ -83,7 +77,6 @@ export default function ProfileEdit() {
         toast.success("CV téléchargé avec succès !");
         await utils.candidate.getProfile.invalidate();
       } catch (e: any) {
-        console.error("Upload error:", e);
         toast.error(e.message || "Erreur lors du téléchargement");
       } finally {
         setCvUploading(false);
@@ -100,8 +93,6 @@ export default function ProfileEdit() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: onDropCv,
-    // On retire la contrainte stricte MIME type car elle bug souvent sous Windows.
-    // On filtre manuellement l'extension dans onDropCv.
     maxSize: 5 * 1024 * 1024,
     multiple: false,
   });
@@ -119,145 +110,179 @@ export default function ProfileEdit() {
 
   if (!isAuthenticated) {
     return (
-      <div className="app-shell flex min-h-screen items-center justify-center p-4">
-        <Card className="glass-panel max-w-md rounded-lg p-8 text-center">
-          <h2 className="text-2xl font-bold">Connexion requise</h2>
-          <Button onClick={() => navigate("/")} className="mt-6 w-full">Retour à l'accueil</Button>
-        </Card>
+      <div className="app-shell flex min-h-screen items-center justify-center p-4" style={{ background: "#07090F" }}>
+        <div className="max-w-md rounded-2xl p-10 text-center" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 40px 80px rgba(0,0,0,0.5)" }}>
+          <h2 className="mb-4 text-2xl font-black text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Connexion requise</h2>
+          <button onClick={() => navigate("/")} className="btn-gold w-full rounded-xl py-3 text-sm">Retour à l'accueil</button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="app-shell min-h-screen">
-      <header className="border-b border-white/70 bg-white/80 backdrop-blur-xl">
+    <div className="app-shell min-h-screen" style={{ background: "#07090F" }}>
+      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
         <div className="container py-6">
           <div className="mb-6 flex items-center justify-between">
             <BrandLogo onClick={() => navigate("/")} />
-            <ThemeToggle />
           </div>
-          <Button onClick={() => navigate("/dashboard")} variant="ghost" className="mb-5">
-            <ArrowLeft className="h-4 w-4" />
-            Retour au tableau de bord
-          </Button>
+          
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="mb-5 flex items-center gap-2 text-sm text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+          >
+            <ArrowLeft size={15} /> Retour au tableau de bord
+          </button>
+          
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <UserRound className="h-6 w-6" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C" }}>
+              <UserRound size={24} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-slate-950">Modifier mon profil</h1>
-              <p className="mt-1 text-muted-foreground">Gardez vos informations candidat à jour pour améliorer le matching.</p>
+              <h1 className="text-3xl font-black tracking-tight text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                Modifier mon profil
+              </h1>
+              <p className="mt-1 text-sm text-[#8B7D6B]">Gardez vos informations à jour pour améliorer le matching IA.</p>
             </div>
           </div>
         </div>
       </header>
 
       <main className="container py-8">
-        <Card className="pro-card max-w-3xl rounded-lg p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid gap-5 md:grid-cols-2">
-              <Field label="Nom complet" hint="Fourni par votre compte Manus">
-                <Input type="text" value={user?.name || ""} disabled className="bg-muted" />
+        <div className="mx-auto max-w-3xl rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            
+            <div className="grid gap-6 md:grid-cols-2">
+              <Field label="Nom complet" hint="Fourni par votre compte">
+                <input
+                  type="text"
+                  value={user?.name || ""}
+                  disabled
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.08)", color: "#8B7D6B" }}
+                />
               </Field>
-              <Field label="Email" hint="Fourni par votre compte Manus">
-                <Input type="email" value={user?.email || ""} disabled className="bg-muted" />
+              <Field label="Email" hint="Fourni par votre compte">
+                <input
+                  type="email"
+                  value={user?.email || ""}
+                  disabled
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.08)", color: "#8B7D6B" }}
+                />
               </Field>
               <Field label="Téléphone">
-                <Input type="tel" placeholder="+212 6XX XXX XXX" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                <input
+                  type="tel"
+                  placeholder="+212 6XX XXX XXX"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#C9A84C]/50"
+                  style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(201,168,76,0.2)", color: "#F0EDE6" }}
+                />
               </Field>
               <Field label="Localisation">
-                <Input type="text" placeholder="Casablanca, Maroc" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
+                <input
+                  type="text"
+                  placeholder="Casablanca, Maroc"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#C9A84C]/50"
+                  style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(201,168,76,0.2)", color: "#F0EDE6" }}
+                />
               </Field>
             </div>
 
             <Field label="Biographie">
-              <Textarea
+              <textarea
                 placeholder="Parlez de vos objectifs professionnels, expériences clés et secteurs ciblés..."
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                rows={5}
+                rows={4}
+                className="w-full resize-none rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#C9A84C]/50"
+                style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(201,168,76,0.2)", color: "#F0EDE6" }}
               />
             </Field>
 
             {/* CV Section */}
-            <div className="border-t border-slate-200 pt-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Mon CV (PDF, DOC)</h3>
+            <div className="border-t border-[rgba(201,168,76,0.12)] pt-8">
+              <h3 className="mb-4 text-lg font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Mon CV (PDF, DOC)</h3>
               
               {(profile as any)?.cvUrl && (profile as any)?.cvFileName ? (
-                <div className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center shrink-0">
-                      <FileText className="w-5 h-5 text-indigo-600" />
+                <div
+                  className="flex items-center justify-between rounded-2xl p-5"
+                  style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>
+                      <FileText size={20} />
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">{(profile as any).cvFileName}</p>
+                      <p className="text-sm font-bold text-[#F0EDE6]">{(profile as any).cvFileName}</p>
                       <a 
                         href={(profile as any).cvUrl} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="text-sm text-indigo-600 hover:underline"
+                        className="text-xs font-semibold text-[#C9A84C] hover:underline"
                       >
                         Afficher le document
                       </a>
                     </div>
                   </div>
-                  <Button 
+                  <button 
                     type="button"
-                    variant="ghost" 
                     onClick={handleRemoveCv}
                     disabled={removeCvMutation.isPending}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[#E07A5F] transition-colors hover:bg-[rgba(224,122,95,0.1)]"
                   >
-                    {removeCvMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                  </Button>
+                    {removeCvMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
+                  </button>
                 </div>
               ) : (
                 <div
                   {...getRootProps()}
-                  className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
-                    isDragActive
-                      ? "border-indigo-500 bg-indigo-50/50"
-                      : "border-slate-200 hover:border-indigo-300 hover:bg-slate-50"
-                  }`}
+                  className="cursor-pointer rounded-2xl border-2 border-dashed p-10 text-center transition-all"
+                  style={{
+                    borderColor: isDragActive ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.15)",
+                    background: isDragActive ? "rgba(201,168,76,0.05)" : "transparent"
+                  }}
                 >
                   <input {...getInputProps()} />
                   {cvUploading || uploadCvMutation.isPending ? (
                     <div className="flex flex-col items-center">
-                      <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-3" />
-                      <p className="text-indigo-600 font-medium">Téléchargement en cours...</p>
+                      <Loader2 size={32} className="mb-4 animate-spin text-[#C9A84C]" />
+                      <p className="font-semibold text-[#C9A84C]">Téléchargement en cours...</p>
                     </div>
                   ) : (
                     <>
-                      <div className="w-12 h-12 bg-indigo-100/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <UploadCloud className="w-6 h-6 text-indigo-600" />
+                      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: "rgba(201,168,76,0.10)", color: "#C9A84C" }}>
+                        <UploadCloud size={24} />
                       </div>
-                      <p className="font-medium text-slate-900 mb-1">
-                        Glissez-déposez votre CV ici
-                      </p>
-                      <p className="text-sm text-slate-500 mb-4">ou cliquez pour parcourir les fichiers</p>
-                      <Button type="button" variant="outline" size="sm" className="rounded-full pointer-events-none">
+                      <p className="mb-2 text-sm font-bold text-[#F0EDE6]">Glissez-déposez votre CV ici</p>
+                      <p className="mb-6 text-xs text-[#8B7D6B]">ou cliquez pour parcourir (Max 5MB)</p>
+                      <button type="button" className="btn-outline-gold rounded-xl px-5 py-2.5 text-sm pointer-events-none">
                         Sélectionner un fichier
-                      </Button>
+                      </button>
                     </>
                   )}
                 </div>
               )}
-              <p className="text-xs text-muted-foreground mt-3">
-                Ce CV sera utilisé automatiquement lorsque vous postulez à une offre ou lors du matching IA.
+              <p className="mt-4 text-xs text-[#8B7D6B]">
+                Ce CV sera utilisé automatiquement lors de vos candidatures et pour le matching IA.
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
-              <Button type="submit" disabled={loading}>
-                <Save className="h-4 w-4" />
-                {loading ? "Enregistrement..." : "Enregistrer"}
-              </Button>
-              <Button type="button" variant="outline" onClick={() => navigate("/dashboard")} className="bg-white/70">
+            <div className="flex flex-col gap-3 border-t border-[rgba(201,168,76,0.12)] pt-6 sm:flex-row">
+              <button type="submit" disabled={loading} className="btn-gold flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm">
+                {loading ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
+                {loading ? "Enregistrement..." : "Enregistrer les modifications"}
+              </button>
+              <button type="button" onClick={() => navigate("/dashboard")} className="btn-outline-gold rounded-xl px-7 py-3 text-sm">
                 Annuler
-              </Button>
+              </button>
             </div>
           </form>
-        </Card>
+        </div>
       </main>
     </div>
   );
@@ -266,9 +291,9 @@ export default function ProfileEdit() {
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-medium text-slate-950">{label}</span>
+      <span className="mb-2 block text-sm font-bold text-[#F0EDE6]">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>}
+      {hint && <span className="mt-1.5 block text-xs font-medium text-[#8B7D6B]">{hint}</span>}
     </label>
   );
 }

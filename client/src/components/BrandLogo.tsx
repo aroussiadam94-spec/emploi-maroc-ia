@@ -1,5 +1,3 @@
-import { BriefcaseBusiness, Sparkles } from "lucide-react";
-
 type BrandLogoProps = {
   compact?: boolean;
   onClick?: () => void;
@@ -8,14 +6,32 @@ type BrandLogoProps = {
 export default function BrandLogo({ compact = false, onClick }: BrandLogoProps) {
   const content = (
     <>
-      <span className="brand-mark relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white shadow-lg shadow-blue-950/20">
-        <BriefcaseBusiness className="h-5 w-5" />
-        <Sparkles className="absolute -right-1 -top-1 h-4 w-4 rounded-full bg-emerald-400 p-0.5 text-slate-950" />
+      {/* Gold geometric logo mark */}
+      <span
+        className="brand-mark relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[#07090F] shadow-lg"
+        style={{ boxShadow: "0 4px 20px rgba(201,168,76,0.35)" }}
+      >
+        {/* Moroccan star SVG */}
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 2L13.8 8.2L20 7L15.8 11.8L18 18L12 14.5L6 18L8.2 11.8L4 7L10.2 8.2L12 2Z"
+            fill="#07090F"
+            strokeLinejoin="round"
+          />
+        </svg>
       </span>
+
       {!compact && (
         <span className="leading-tight">
-          <span className="block text-base font-black tracking-tight text-foreground">Emploi Maroc</span>
-          <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-primary">IA Matching</span>
+          <span
+            className="block text-base tracking-tight text-[#F0EDE6]"
+            style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 800 }}
+          >
+            Emploi Maroc
+          </span>
+          <span className="block text-[10px] font-bold uppercase tracking-[0.20em] text-[#C9A84C]">
+            IA · Carrières
+          </span>
         </span>
       )}
     </>
@@ -23,7 +39,11 @@ export default function BrandLogo({ compact = false, onClick }: BrandLogoProps) 
 
   if (onClick) {
     return (
-      <button onClick={onClick} className="group flex items-center gap-3 transition-transform duration-200 hover:-translate-y-0.5">
+      <button
+        onClick={onClick}
+        className="group flex items-center gap-3 transition-all duration-200 hover:opacity-90"
+        aria-label="Emploi Maroc — Accueil"
+      >
         {content}
       </button>
     );

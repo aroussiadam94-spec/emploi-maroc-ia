@@ -1,27 +1,15 @@
-import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
+import { type Dispatch, type SetStateAction, useMemo, useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import {
-  Banknote,
-  Bell,
-  Briefcase,
-  Building2,
-  ChevronRight,
-  Clock,
-  Loader2,
-  MapPin,
-  RefreshCw,
-  Search as SearchIcon,
-  SlidersHorizontal,
-  Sparkles,
-  X,
+  Banknote, Bell, Briefcase, Building2, ChevronRight, Clock,
+  Loader2, MapPin, RefreshCw, Search as SearchIcon, SlidersHorizontal,
+  Sparkles, X, ArrowLeft, Filter,
 } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
-import ThemeToggle from "@/components/ThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,24 +23,27 @@ type Filters = {
   experienceLevel: string;
 };
 
-const CONTRACT_COLORS: Record<string, string> = {
-  CDI: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  CDD: "bg-amber-50 text-amber-700 border-amber-200",
-  Stage: "bg-blue-50 text-blue-700 border-blue-200",
-  Freelance: "bg-violet-50 text-violet-700 border-violet-200",
-  Alternance: "bg-orange-50 text-orange-700 border-orange-200",
+const CONTRACT_COLORS: Record<string, { bg: string; color: string }> = {
+  CDI:        { bg: "rgba(52,211,153,0.12)",  color: "#34D399" },
+  CDD:        { bg: "rgba(201,168,76,0.12)",  color: "#C9A84C" },
+  Stage:      { bg: "rgba(123,167,188,0.12)", color: "#7BA7BC" },
+  Freelance:  { bg: "rgba(167,139,250,0.12)", color: "#A78BFA" },
+  Alternance: { bg: "rgba(224,122,95,0.12)",  color: "#E07A5F" },
 };
 
-const SECTORS = ["IT", "Finance", "Marketing", "RH", "Ventes", "Logistique", "BTP", "Tourisme", "Santé", "Agriculture", "Autres"];
+const SECTORS       = ["IT", "Finance", "Marketing", "RH", "Ventes", "Logistique", "BTP", "Tourisme", "Santé", "Agriculture", "Autres"];
 const CONTRACT_TYPES = ["CDI", "CDD", "Stage", "Freelance", "Alternance"];
-const LOCATIONS = ["Casablanca", "Rabat", "Marrakech", "Tanger", "Agadir", "Fès", "El Jadida"];
-const EXPERIENCE = ["Junior", "Confirmé", "Senior"];
-const AVATAR_COLORS = ["bg-blue-600", "bg-emerald-600", "bg-cyan-600", "bg-violet-600", "bg-rose-600", "bg-amber-600"];
+const LOCATIONS     = ["Casablanca", "Rabat", "Marrakech", "Tanger", "Agadir", "Fès", "El Jadida"];
+const EXPERIENCE    = ["Junior", "Confirmé", "Senior"];
+
+const AVATAR_PALETTE = [
+  "#1a4a3a", "#4a3a1a", "#1a2e4a", "#3a1a4a", "#4a1a2e", "#1a3a4a"
+];
 
 function getAvatarColor(company = "") {
   let hash = 0;
-  for (const ch of company) hash = (hash * 31 + ch.charCodeAt(0)) % AVATAR_COLORS.length;
-  return AVATAR_COLORS[Math.abs(hash)];
+  for (const ch of company) hash = (hash * 31 + ch.charCodeAt(0)) % AVATAR_PALETTE.length;
+  return AVATAR_PALETTE[Math.abs(hash)];
 }
 
 function timeAgo(dateStr: string | null | undefined) {
@@ -77,98 +68,142 @@ function parseSkills(skills: unknown): string[] {
   }
 }
 
-function JobCard({ job, onClick, index, matchingAlertName }: { job: any; onClick: () => void; index: number; matchingAlertName?: string }) {
-  const skills = parseSkills(job.skills);
-  const contractClass = CONTRACT_COLORS[job.contractType] ?? "bg-slate-100 text-slate-600 border-slate-200";
-  const avatarColor = getAvatarColor(job.company);
+function JobCard({
+  job, onClick, index, matchingAlertName,
+}: {
+  job: any; onClick: () => void; index: number; matchingAlertName?: string;
+}) {
+  const skills       = parseSkills(job.skills);
+  const contractStyle = CONTRACT_COLORS[job.contractType] ?? { bg: "rgba(139,125,107,0.12)", color: "#8B7D6B" };
+  const avatarColor  = getAvatarColor(job.company);
+  const initial      = String(job.company || "?").charAt(0).toUpperCase();
 
   return (
-    <Card
+    <div
       onClick={onClick}
-      className="pro-card group cursor-pointer rounded-lg p-5 animate-rise"
-      style={{ animationDelay: `${Math.min(index, 8) * 55}ms` }}
+      className="pro-card group cursor-pointer rounded-2xl p-5"
+      style={{
+        animationDelay: `${Math.min(index, 8) * 55}ms`,
+        animation: "rise-in 500ms cubic-bezier(0.22,1,0.36,1) both",
+      }}
     >
       <div className="flex items-start gap-4">
-        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${avatarColor} text-lg font-bold text-white shadow-lg shadow-slate-900/10`}>
-          {String(job.company || "?").charAt(0).toUpperCase()}
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg font-black text-white"
+          style={{
+            background: avatarColor,
+            fontFamily: "'Playfair Display', Georgia, serif",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+          }}
+        >
+          {initial}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="line-clamp-2 text-base font-semibold leading-snug text-slate-950 transition-colors group-hover:text-primary">
+          <h3
+            className="line-clamp-2 text-base font-semibold leading-snug text-[#F0EDE6] transition-colors group-hover:text-[#C9A84C]"
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+          >
             {job.title}
           </h3>
-          <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Building2 className="h-3.5 w-3.5 shrink-0" />
+          <div className="mt-1 flex items-center gap-1.5 text-sm text-[#8B7D6B]">
+            <Building2 size={13} className="shrink-0" />
             <span className="truncate">{job.company}</span>
           </div>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
+      <div className="mt-4 flex flex-wrap gap-2 text-xs text-[#8B7D6B]">
         {job.location && (
-          <span className="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2.5 py-1">
-            <MapPin className="h-3.5 w-3.5" />
-            {job.location}
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#1E2338] px-3 py-1">
+            <MapPin size={11} /> {job.location}
           </span>
         )}
         {job.salaryMin && job.salaryMax && (
-          <span className="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2.5 py-1">
-            <Banknote className="h-3.5 w-3.5" />
-            {Number(job.salaryMin).toLocaleString("fr-MA")} - {Number(job.salaryMax).toLocaleString("fr-MA")} MAD
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#1E2338] px-3 py-1">
+            <Banknote size={11} />
+            {Number(job.salaryMin).toLocaleString("fr-MA")} – {Number(job.salaryMax).toLocaleString("fr-MA")} MAD
           </span>
         )}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {job.contractType && <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${contractClass}`}>{job.contractType}</span>}
-        {job.sector && <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">{job.sector}</span>}
-        {job.experienceLevel && <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">{job.experienceLevel}</span>}
+      <div className="mt-3 flex flex-wrap gap-2">
+        {job.contractType && (
+          <span
+            className="rounded-full px-3 py-1 text-xs font-semibold"
+            style={{ background: contractStyle.bg, color: contractStyle.color }}
+          >
+            {job.contractType}
+          </span>
+        )}
+        {job.sector && (
+          <span className="rounded-full bg-[#1E2338] px-3 py-1 text-xs font-medium text-[#8B7D6B]">
+            {job.sector}
+          </span>
+        )}
+        {job.experienceLevel && (
+          <span className="rounded-full bg-[rgba(123,167,188,0.12)] px-3 py-1 text-xs font-medium text-[#7BA7BC]">
+            {job.experienceLevel}
+          </span>
+        )}
       </div>
 
       {skills.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {skills.slice(0, 3).map((skill) => (
-            <span key={skill} className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
+            <span
+              key={skill}
+              className="rounded-lg px-2.5 py-1 text-xs font-medium"
+              style={{ background: "rgba(52,211,153,0.10)", color: "#34D399" }}
+            >
               {skill}
             </span>
           ))}
-          {skills.length > 3 && <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-muted-foreground">+{skills.length - 3}</span>}
+          {skills.length > 3 && (
+            <span className="rounded-lg bg-[#1E2338] px-2.5 py-1 text-xs text-[#8B7D6B]">
+              +{skills.length - 3}
+            </span>
+          )}
         </div>
       )}
 
-      <div className="mt-4 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+      <div className="mt-4 flex items-center justify-between gap-2 text-xs text-[#8B7D6B]">
         <span className="inline-flex items-center gap-1">
-          <Clock className="h-3.5 w-3.5" />
-          {timeAgo(job.publishedDate)}
+          <Clock size={11} /> {timeAgo(job.publishedDate)}
         </span>
-        <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-all group-hover:gap-2">
-          Voir l'offre
-          <ChevronRight className="h-3.5 w-3.5" />
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#C9A84C] transition-all group-hover:gap-2">
+          Voir l'offre <ChevronRight size={12} />
         </span>
       </div>
 
       {matchingAlertName && (
-        <div className="mt-3 flex items-center gap-1.5 rounded-md bg-rose-50 px-2.5 py-1.5 text-xs font-medium text-rose-700 border border-rose-100">
-          <Bell className="h-3.5 w-3.5 shrink-0" />
+        <div
+          className="mt-3 flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium"
+          style={{ background: "rgba(224,122,95,0.10)", color: "#E07A5F", border: "1px solid rgba(224,122,95,0.20)" }}
+        >
+          <Bell size={11} className="shrink-0" />
           <span className="truncate">Alerte : {matchingAlertName}</span>
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 
 function SkeletonCard() {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <div
+      className="rounded-2xl p-5"
+      style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(201,168,76,0.08)" }}
+    >
       <div className="animate-pulse space-y-4">
         <div className="flex gap-4">
-          <div className="h-12 w-12 rounded-lg bg-slate-200" />
+          <div className="h-12 w-12 rounded-xl bg-[#1E2338]" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 w-3/4 rounded bg-slate-200" />
-            <div className="h-3 w-1/2 rounded bg-slate-100" />
+            <div className="h-4 w-3/4 rounded-lg bg-[#1E2338]" />
+            <div className="h-3 w-1/2 rounded-lg bg-[#1E2338]/60" />
           </div>
         </div>
-        <div className="h-8 rounded bg-slate-100" />
-        <div className="h-12 rounded bg-slate-100" />
+        <div className="h-8 rounded-lg bg-[#1E2338]/60" />
+        <div className="h-12 rounded-lg bg-[#1E2338]/40" />
       </div>
     </div>
   );
@@ -182,11 +217,9 @@ export default function Search() {
   const [filters, setFilters] = useState<Filters>({ sector: "", contractType: "", location: "", experienceLevel: "" });
 
   const { data: jobs, isLoading } = trpc.jobs.search.useQuery({ limit: 100, offset: 0 });
-  const { isAuthenticated } = trpc.auth ? { isAuthenticated: true } : { isAuthenticated: false };
   const { data: userAlerts = [] } = trpc.jobs.getAlerts.useQuery(undefined, { retry: false });
   const createAlertMutation = trpc.jobs.createAlert.useMutation();
 
-  // Returns the first alert name that matches this job
   const getMatchingAlert = (job: any): string | undefined => {
     for (const alert of userAlerts as any[]) {
       const haystack = `${job.title} ${job.company} ${job.description ?? ""}`.toLowerCase();
@@ -205,7 +238,6 @@ export default function Search() {
     if (filters.sector) parts.push(filters.sector);
     if (filters.location) parts.push(filters.location);
     const name = parts.length > 0 ? parts.join(" • ") : "Toutes les offres";
-
     try {
       await createAlertMutation.mutateAsync({
         name,
@@ -214,9 +246,7 @@ export default function Search() {
         locations: filters.location || undefined,
         contractTypes: filters.contractType || undefined,
       });
-      toast.success(`Alerte « ${name} » créée !`, {
-        description: "Retrouvez-la dans votre tableau de bord.",
-      });
+      toast.success(`Alerte « ${name} » créée !`, { description: "Retrouvez-la dans votre tableau de bord." });
     } catch {
       toast.error("Connexion requise", { description: "Veuillez vous connecter pour créer une alerte." });
     }
@@ -246,99 +276,183 @@ export default function Search() {
   };
 
   return (
-    <div className="app-shell min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-white/70 bg-white/80 backdrop-blur-xl">
+    <div className="app-shell min-h-screen" style={{ background: "#07090F" }}>
+      {/* Header */}
+      <header className="nav-glass sticky top-0 z-40">
         <div className="container flex flex-col gap-4 py-4 lg:flex-row lg:items-center">
           <BrandLogo onClick={() => navigate("/")} />
 
+          {/* Search input */}
           <div className="relative min-w-0 flex-1">
-            <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <SearchIcon
+              size={16}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C9A84C]"
+            />
             <input
               type="text"
               placeholder="Poste, compétence, entreprise..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-11 w-full rounded-md border border-slate-200 bg-white pl-10 pr-10 text-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10"
+              className="h-11 w-full rounded-xl pl-10 pr-10 text-sm outline-none"
+              style={{
+                background: "rgba(14,16,32,0.85)",
+                border: "1px solid rgba(201,168,76,0.18)",
+                color: "#F0EDE6",
+              }}
             />
             {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                <X className="h-4 w-4" />
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8B7D6B] hover:text-[#F0EDE6]"
+              >
+                <X size={14} />
               </button>
             )}
           </div>
 
+          {/* Action buttons */}
           <div className="flex flex-wrap items-center gap-2">
-            <ThemeToggle />
-            <FilterDropdown filters={filters} activeFilterCount={activeFilterCount} clearFilters={clearFilters} setFilters={setFilters} />
-            <Button onClick={refreshJobs} disabled={seedMutation.isPending} variant="outline" className="gap-2 bg-white/70">
-              {seedMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            <FilterDropdown
+              filters={filters}
+              activeFilterCount={activeFilterCount}
+              clearFilters={clearFilters}
+              setFilters={setFilters}
+            />
+            <button
+              onClick={refreshJobs}
+              disabled={seedMutation.isPending}
+              className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#F0EDE6]"
+              style={{ background: "rgba(14,16,32,0.8)", border: "1px solid rgba(201,168,76,0.15)" }}
+            >
+              {seedMutation.isPending
+                ? <Loader2 size={14} className="animate-spin" />
+                : <RefreshCw size={14} />}
               Actualiser
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={handleCreateAlert}
               disabled={createAlertMutation.isPending}
-              variant="outline"
-              className="gap-2 bg-white/70 border-rose-200 text-rose-700 hover:bg-rose-50 hover:border-rose-300"
+              className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
+              style={{
+                background: "rgba(224,122,95,0.10)",
+                border: "1px solid rgba(224,122,95,0.20)",
+                color: "#E07A5F",
+              }}
             >
-              {createAlertMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
+              {createAlertMutation.isPending
+                ? <Loader2 size={14} className="animate-spin" />
+                : <Bell size={14} />}
               Créer une alerte
-            </Button>
-            <Button onClick={() => navigate("/swipe")} variant="ghost">Swipe IA</Button>
-            <Button onClick={() => navigate("/dashboard")} variant="ghost">Dashboard</Button>
+            </button>
+            <button
+              onClick={() => navigate("/swipe")}
+              className="rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+            >
+              Swipe IA
+            </button>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+            >
+              Dashboard
+            </button>
           </div>
         </div>
       </header>
 
       <main className="container py-8">
-        <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        {/* Page title */}
+        <div className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <Badge className="mb-3 bg-blue-50 text-blue-700 hover:bg-blue-50">
-              <Sparkles className="h-3.5 w-3.5" />
+            <span className="badge-gold mb-3 inline-flex">
+              <Sparkles size={11} />
               Matching intelligent
-            </Badge>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-950">Recherche d'offres</h1>
-            <p className="mt-2 text-muted-foreground">Filtrez les opportunités et ouvrez les fiches qui correspondent à votre trajectoire.</p>
+            </span>
+            <h1
+              className="text-3xl font-black text-[#F0EDE6]"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            >
+              Recherche d'offres
+            </h1>
+            <p className="mt-2 text-[#8B7D6B]">
+              Filtrez les opportunités et postulez aux meilleures offres du Maroc.
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            <strong className="text-slate-950">{filteredJobs.length}</strong> offre{filteredJobs.length !== 1 ? "s" : ""} trouvée{filteredJobs.length !== 1 ? "s" : ""}
+          <p className="text-sm text-[#8B7D6B]">
+            <span className="text-[#C9A84C] font-bold">{filteredJobs.length}</span>{" "}
+            offre{filteredJobs.length !== 1 ? "s" : ""} trouvée{filteredJobs.length !== 1 ? "s" : ""}
           </p>
         </div>
 
+        {/* Active filters */}
         {activeFilterCount > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
+          <div className="mb-5 flex flex-wrap gap-2">
             {Object.entries(filters).map(([key, value]) =>
               value ? (
-                <Badge key={key} variant="secondary" className="gap-1">
+                <span
+                  key={key}
+                  className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
+                  style={{
+                    background: "rgba(201,168,76,0.12)",
+                    color: "#C9A84C",
+                    border: "1px solid rgba(201,168,76,0.25)",
+                  }}
+                >
                   {value}
-                  <button onClick={() => setFilters((f) => ({ ...f, [key]: "" }))} className="hover:text-destructive">
-                    <X className="h-3 w-3" />
+                  <button
+                    onClick={() => setFilters((f) => ({ ...f, [key]: "" }))}
+                    className="hover:text-white"
+                  >
+                    <X size={11} />
                   </button>
-                </Badge>
+                </span>
               ) : null
             )}
           </div>
         )}
 
+        {/* Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : filteredJobs.length === 0 ? (
-          <div className="glass-panel rounded-lg py-20 text-center">
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-lg bg-slate-100">
-              <Briefcase className="h-8 w-8 text-muted-foreground" />
+          <div
+            className="rounded-2xl py-20 text-center"
+            style={{ background: "rgba(14,16,32,0.7)", border: "1px solid rgba(201,168,76,0.10)" }}
+          >
+            <div
+              className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+              style={{ background: "rgba(201,168,76,0.10)", color: "#C9A84C" }}
+            >
+              <Briefcase size={28} />
             </div>
-            <h3 className="text-lg font-semibold">Aucune offre trouvée</h3>
-            <p className="mt-2 text-muted-foreground">Essayez d'élargir vos critères ou chargez de nouvelles offres.</p>
-            <Button onClick={refreshJobs} disabled={seedMutation.isPending} className="mt-6 gap-2">
-              {seedMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            <h3
+              className="text-xl font-bold text-[#F0EDE6]"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            >
+              Aucune offre trouvée
+            </h3>
+            <p className="mt-2 text-[#8B7D6B]">Essayez d'élargir vos critères ou chargez de nouvelles offres.</p>
+            <button
+              onClick={refreshJobs}
+              disabled={seedMutation.isPending}
+              className="btn-gold mt-7 rounded-xl px-6 py-3 text-sm"
+            >
+              {seedMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
               Charger les offres
-            </Button>
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
             {filteredJobs.map((job: any, index: number) => (
-              <JobCard key={job.id} job={job} index={index} onClick={() => navigate(`/job/${job.id}`)} matchingAlertName={getMatchingAlert(job)} />
+              <JobCard
+                key={job.id}
+                job={job}
+                index={index}
+                onClick={() => navigate(`/job/${job.id}`)}
+                matchingAlertName={getMatchingAlert(job)}
+              />
             ))}
           </div>
         )}
@@ -347,12 +461,7 @@ export default function Search() {
   );
 }
 
-function FilterDropdown({
-  filters,
-  activeFilterCount,
-  clearFilters,
-  setFilters,
-}: {
+function FilterDropdown({ filters, activeFilterCount, clearFilters, setFilters }: {
   filters: Filters;
   activeFilterCount: number;
   clearFilters: () => void;
@@ -361,70 +470,104 @@ function FilterDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={activeFilterCount > 0 ? "default" : "outline"} className="gap-2">
-          <SlidersHorizontal className="h-4 w-4" />
+        <button
+          className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all"
+          style={{
+            background: activeFilterCount > 0 ? "rgba(201,168,76,0.15)" : "rgba(14,16,32,0.8)",
+            border: `1px solid ${activeFilterCount > 0 ? "rgba(201,168,76,0.35)" : "rgba(201,168,76,0.15)"}`,
+            color: activeFilterCount > 0 ? "#C9A84C" : "#8B7D6B",
+          }}
+        >
+          <Filter size={14} />
           Filtres
-          {activeFilterCount > 0 && <span className="rounded-full bg-white/20 px-1.5 text-xs">{activeFilterCount}</span>}
-        </Button>
+          {activeFilterCount > 0 && (
+            <span
+              className="flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
+              style={{ background: "#C9A84C", color: "#07090F" }}
+            >
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" sideOffset={10} className="w-[min(92vw,560px)] rounded-lg border-border bg-card p-5 shadow-2xl">
-        <div className="mb-5 flex items-center justify-between gap-3">
+      <DropdownMenuContent
+        align="end"
+        sideOffset={10}
+        className="w-[min(92vw,560px)] rounded-2xl p-6 shadow-2xl"
+        style={{
+          background: "#0E1020",
+          border: "1px solid rgba(201,168,76,0.15)",
+          boxShadow: "0 40px 80px rgba(0,0,0,0.6)",
+        }}
+      >
+        <div className="mb-6 flex items-center justify-between gap-3">
           <div>
-            <p className="font-semibold text-foreground">Filtres</p>
-            <p className="text-xs text-muted-foreground">Affinez les offres sans quitter la grille.</p>
+            <p className="font-bold text-[#F0EDE6]"
+               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+              Filtres
+            </p>
+            <p className="text-xs text-[#8B7D6B]">Affinez sans quitter la grille.</p>
           </div>
           {activeFilterCount > 0 && (
-            <button onClick={clearFilters} className="text-xs font-semibold text-primary hover:underline">
+            <button
+              onClick={clearFilters}
+              className="text-xs font-bold text-[#C9A84C] hover:underline"
+            >
               Réinitialiser
             </button>
           )}
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2">
-          <FilterBlock title="Secteur" values={SECTORS} selected={filters.sector} onSelect={(sector) => setFilters((f) => ({ ...f, sector: f.sector === sector ? "" : sector }))} />
-          <FilterBlock title="Ville" values={LOCATIONS} selected={filters.location} onSelect={(location) => setFilters((f) => ({ ...f, location: f.location === location ? "" : location }))} />
-          <FilterBlock title="Contrat" values={CONTRACT_TYPES} selected={filters.contractType} onSelect={(contractType) => setFilters((f) => ({ ...f, contractType: f.contractType === contractType ? "" : contractType }))} compact />
-          <FilterBlock title="Expérience" values={EXPERIENCE} selected={filters.experienceLevel} onSelect={(experienceLevel) => setFilters((f) => ({ ...f, experienceLevel: f.experienceLevel === experienceLevel ? "" : experienceLevel }))} compact />
+        <div className="grid gap-6 md:grid-cols-2">
+          <FilterBlock title="Secteur" values={SECTORS} selected={filters.sector}
+            onSelect={(sector) => setFilters((f) => ({ ...f, sector: f.sector === sector ? "" : sector }))} />
+          <FilterBlock title="Ville" values={LOCATIONS} selected={filters.location}
+            onSelect={(location) => setFilters((f) => ({ ...f, location: f.location === location ? "" : location }))} />
+          <FilterBlock title="Contrat" values={CONTRACT_TYPES} selected={filters.contractType}
+            onSelect={(contractType) => setFilters((f) => ({ ...f, contractType: f.contractType === contractType ? "" : contractType }))} compact />
+          <FilterBlock title="Expérience" values={EXPERIENCE} selected={filters.experienceLevel}
+            onSelect={(experienceLevel) => setFilters((f) => ({ ...f, experienceLevel: f.experienceLevel === experienceLevel ? "" : experienceLevel }))} compact />
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-function FilterBlock({
-  title,
-  values,
-  selected,
-  onSelect,
-  compact = false,
-}: {
-  title: string;
-  values: string[];
-  selected: string;
-  onSelect: (value: string) => void;
-  compact?: boolean;
+function FilterBlock({ title, values, selected, onSelect, compact = false }: {
+  title: string; values: string[]; selected: string; onSelect: (value: string) => void; compact?: boolean;
 }) {
   return (
     <div>
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
+      <p className="mb-2.5 text-xs font-black uppercase tracking-[0.15em] text-[#C9A84C]">{title}</p>
       <div className={compact ? "flex flex-wrap gap-2" : "grid gap-1"}>
-        {values.map((value) => (
-          <button
-            key={value}
-            onClick={(event) => {
-              event.preventDefault();
-              onSelect(value);
-            }}
-            className={
-              compact
-                ? `rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${selected === value ? "border-primary bg-primary text-primary-foreground" : "border-slate-200 bg-white text-slate-700 hover:border-primary/40"}`
-                : `w-full rounded-md px-3 py-2 text-left text-sm transition-all ${selected === value ? "bg-primary text-primary-foreground" : "text-slate-700 hover:bg-slate-100"}`
-            }
-          >
-            {value}
-          </button>
-        ))}
+        {values.map((value) => {
+          const active = selected === value;
+          return (
+            <button
+              key={value}
+              onClick={(e) => { e.preventDefault(); onSelect(value); }}
+              className={
+                compact
+                  ? "rounded-full px-3 py-1.5 text-xs font-medium transition-all"
+                  : "w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-all"
+              }
+              style={{
+                background: active ? "rgba(201,168,76,0.18)" : "transparent",
+                color: active ? "#C9A84C" : "#8B7D6B",
+                border: compact ? `1px solid ${active ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.12)"}` : "none",
+              }}
+              onMouseEnter={(e) => {
+                if (!active) (e.currentTarget as HTMLButtonElement).style.color = "#F0EDE6";
+              }}
+              onMouseLeave={(e) => {
+                if (!active) (e.currentTarget as HTMLButtonElement).style.color = "#8B7D6B";
+              }}
+            >
+              {value}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
