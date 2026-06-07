@@ -14,12 +14,12 @@
  *   protectedProcedure – requires a valid session; throws UNAUTHED if missing.
  */
 
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 // Database query helpers for core entities.
-import { getCandidateByUserId, createOrUpdateCandidate, getJobOfferById, getJobOffers, createApplication, checkApplication, toggleSavedJob, checkSavedJob, getSavedJobs, getApplications, createJobAlert, getJobAlerts, deleteJobAlert } from "./db";
+import { getCandidateByUserId, createOrUpdateCandidate, getJobOfferById, getJobOffers, createApplication, checkApplication, toggleSavedJob, checkSavedJob, getSavedJobs, getApplications, createJobAlert, getJobAlerts, deleteJobAlert, getUserByEmail, createLocalUser } from "./db";
 // Profile sub-resource helpers (experiences, educations, skills, preferences).
 import {
   getExperiences,
@@ -40,6 +40,8 @@ import { storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
 // Zod for input validation schemas.
 import { z } from "zod";
+import crypto from "crypto";
+import { sdk } from "./_core/sdk";
 
 export const appRouter = router({
   // ── System ────────────────────────────────────────────────────────────────
@@ -60,6 +62,79 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+
+    /** Registers a new user with an email and password */
+    registerLocal: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email("Format d'email invalide"),
+          password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+          name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const existingUser = await getUserByEmail(input.email);
+        if (existingUser) {
+          throw new Error("Cet email est déjà utilisé");
+        }
+
+        const salt = crypto.randomBytes(16).toString("hex");
+        const derivedKey = crypto.scryptSync(input.password, salt, 64).toString("hex");
+        const passwordHash = `${salt}:${derivedKey}`;
+        const openId = `local:${input.email}`;
+
+        await createLocalUser({
+          openId,
+          name: input.name,
+          email: input.email,
+          passwordHash,
+        });
+
+        const sessionToken = await sdk.createSessionToken(openId, {
+          name: input.name,
+          expiresInMs: ONE_YEAR_MS,
+        });
+
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+        return { success: true };
+      }),
+
+    /** Authenticates a user with email and password */
+    loginLocal: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          password: z.string(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const user = await getUserByEmail(input.email);
+        if (!user || !user.password) {
+          throw new Error("Email ou mot de passe incorrect");
+        }
+
+        const [salt, key] = user.password.split(":");
+        if (!salt || !key) {
+          throw new Error("Format de mot de passe invalide");
+        }
+
+        const derivedKey = crypto.scryptSync(input.password, salt, 64).toString("hex");
+        if (derivedKey !== key) {
+          throw new Error("Email ou mot de passe incorrect");
+        }
+
+        const sessionToken = await sdk.createSessionToken(user.openId, {
+          name: user.name || "",
+          expiresInMs: ONE_YEAR_MS,
+        });
+
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+        return { success: true };
+      }),
   }),
 
   // ── Candidate ─────────────────────────────────────────────────────────────

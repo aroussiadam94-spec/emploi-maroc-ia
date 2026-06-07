@@ -1,10 +1,10 @@
 import { sqliteTable, text, integer, real, blob } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
-// Users table
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   openId: text("openId").notNull().unique(),
+  password: text("password"),
   name: text("name"),
   email: text("email"),
   loginMethod: text("loginMethod"),

@@ -16,6 +16,7 @@ import Dashboard from "./pages/Dashboard";
 import ProfileEdit from "./pages/ProfileEdit";
 import CVUpload from "./pages/CVUpload";
 import Swipe from "./pages/Swipe";
+import Login from "./pages/Login";
 // Floating AI chat assistant rendered on every page.
 import ChatBot from "./components/ChatBot";
 
@@ -25,6 +26,8 @@ function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
+      {/* Login and authentication page */}
+      <Route path={"/login"} component={Login} />
       {/* Landing / home page */}
       <Route path={"/"} component={Home} />
       {/* Job search results page */}

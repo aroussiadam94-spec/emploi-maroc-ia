@@ -32,6 +32,7 @@ function initSqliteTables(client: any) {
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       openId TEXT NOT NULL UNIQUE,
+      password TEXT,
       name TEXT,
       email TEXT,
       loginMethod TEXT,
@@ -194,6 +195,15 @@ export async function getDb(): Promise<AnyDb | null> {
 
       // Ensure all tables exist before returning the connection.
       await initSqliteTables(client);
+      
+      // Migration: add password column if it doesn't exist
+      try {
+        await client.execute('ALTER TABLE users ADD COLUMN password TEXT;');
+        console.log('[Database] Migrated users table: added password column');
+      } catch (err: any) {
+        // Ignored, column likely already exists
+      }
+
       _db = drizzle(client);
 
       if (useTurso) console.log(`[Database] ✅ Turso connected successfully!`);
@@ -301,6 +311,56 @@ export async function getUserByOpenId(openId: string) {
     const { users } = await import("../drizzle/schema");
     const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
     return result[0];
+  }
+}
+
+/** Fetches a single user record by their email address. */
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  if (_isSqlite) {
+    const { users } = await import("../drizzle/sqlite-schema");
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
+  } else {
+    const { users } = await import("../drizzle/schema");
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
+  }
+}
+
+/** Creates a local user with email, password and name */
+export async function createLocalUser(user: {
+  openId: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const signedInAt = new Date();
+
+  if (_isSqlite) {
+    const { users } = await import("../drizzle/sqlite-schema");
+    await db.insert(users).values({
+      openId: user.openId,
+      password: user.passwordHash,
+      name: user.name,
+      email: user.email,
+      loginMethod: "local",
+      lastSignedIn: signedInAt.toISOString(),
+    });
+  } else {
+    const { users } = await import("../drizzle/schema");
+    await db.insert(users).values({
+      openId: user.openId,
+      password: user.passwordHash,
+      name: user.name,
+      email: user.email,
+      loginMethod: "local",
+      lastSignedIn: signedInAt,
+    });
   }
 }
 
