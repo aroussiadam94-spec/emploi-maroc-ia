@@ -25,10 +25,10 @@ type Filters = {
 
 const CONTRACT_COLORS: Record<string, { bg: string; color: string }> = {
   CDI:        { bg: "rgba(52,211,153,0.12)",  color: "#34D399" },
-  CDD:        { bg: "rgba(201,168,76,0.12)",  color: "#C9A84C" },
+  CDD:        { bg: "rgba(5,150,105,0.12)",  color: "#059669" },
   Stage:      { bg: "rgba(123,167,188,0.12)", color: "#7BA7BC" },
   Freelance:  { bg: "rgba(167,139,250,0.12)", color: "#A78BFA" },
-  Alternance: { bg: "rgba(224,122,95,0.12)",  color: "#E07A5F" },
+  Alternance: { bg: "rgba(224,122,95,0.12)",  color: "#15803d" },
 };
 
 const SECTORS       = ["IT", "Finance", "Marketing", "RH", "Ventes", "Logistique", "BTP", "Tourisme", "Santé", "Agriculture", "Autres"];
@@ -100,7 +100,7 @@ function JobCard({
         </div>
         <div className="min-w-0 flex-1">
           <h3
-            className="line-clamp-2 text-base font-semibold leading-snug text-[#F0EDE6] transition-colors group-hover:text-[#C9A84C]"
+            className="line-clamp-2 text-base font-semibold leading-snug text-[#1c1917] transition-colors group-hover:text-[#059669]"
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
           >
             {job.title}
@@ -114,12 +114,12 @@ function JobCard({
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-[#8B7D6B]">
         {job.location && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#1E2338] px-3 py-1">
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#f5f5f4] px-3 py-1">
             <MapPin size={11} /> {job.location}
           </span>
         )}
         {job.salaryMin && job.salaryMax && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#1E2338] px-3 py-1">
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#f5f5f4] px-3 py-1">
             <Banknote size={11} />
             {Number(job.salaryMin).toLocaleString("fr-MA")} – {Number(job.salaryMax).toLocaleString("fr-MA")} MAD
           </span>
@@ -136,7 +136,7 @@ function JobCard({
           </span>
         )}
         {job.sector && (
-          <span className="rounded-full bg-[#1E2338] px-3 py-1 text-xs font-medium text-[#8B7D6B]">
+          <span className="rounded-full bg-[#f5f5f4] px-3 py-1 text-xs font-medium text-[#8B7D6B]">
             {job.sector}
           </span>
         )}
@@ -159,7 +159,7 @@ function JobCard({
             </span>
           ))}
           {skills.length > 3 && (
-            <span className="rounded-lg bg-[#1E2338] px-2.5 py-1 text-xs text-[#8B7D6B]">
+            <span className="rounded-lg bg-[#f5f5f4] px-2.5 py-1 text-xs text-[#8B7D6B]">
               +{skills.length - 3}
             </span>
           )}
@@ -170,7 +170,7 @@ function JobCard({
         <span className="inline-flex items-center gap-1">
           <Clock size={11} /> {timeAgo(job.publishedDate)}
         </span>
-        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#C9A84C] transition-all group-hover:gap-2">
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#059669] transition-all group-hover:gap-2">
           Voir l'offre <ChevronRight size={12} />
         </span>
       </div>
@@ -178,7 +178,7 @@ function JobCard({
       {matchingAlertName && (
         <div
           className="mt-3 flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium"
-          style={{ background: "rgba(224,122,95,0.10)", color: "#E07A5F", border: "1px solid rgba(224,122,95,0.20)" }}
+          style={{ background: "rgba(224,122,95,0.10)", color: "#15803d", border: "1px solid rgba(224,122,95,0.20)" }}
         >
           <Bell size={11} className="shrink-0" />
           <span className="truncate">Alerte : {matchingAlertName}</span>
@@ -192,18 +192,18 @@ function SkeletonCard() {
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(201,168,76,0.08)" }}
+      style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(5,150,105,0.08)" }}
     >
       <div className="animate-pulse space-y-4">
         <div className="flex gap-4">
-          <div className="h-12 w-12 rounded-xl bg-[#1E2338]" />
+          <div className="h-12 w-12 rounded-xl bg-[#f5f5f4]" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 w-3/4 rounded-lg bg-[#1E2338]" />
-            <div className="h-3 w-1/2 rounded-lg bg-[#1E2338]/60" />
+            <div className="h-4 w-3/4 rounded-lg bg-[#f5f5f4]" />
+            <div className="h-3 w-1/2 rounded-lg bg-[#f5f5f4]/60" />
           </div>
         </div>
-        <div className="h-8 rounded-lg bg-[#1E2338]/60" />
-        <div className="h-12 rounded-lg bg-[#1E2338]/40" />
+        <div className="h-8 rounded-lg bg-[#f5f5f4]/60" />
+        <div className="h-12 rounded-lg bg-[#f5f5f4]/40" />
       </div>
     </div>
   );
@@ -276,7 +276,7 @@ export default function Search() {
   };
 
   return (
-    <div className="app-shell min-h-screen" style={{ background: "#07090F" }}>
+    <div className="app-shell min-h-screen" style={{ background: "#fafafa" }}>
       {/* Header */}
       <header className="nav-glass sticky top-0 z-40">
         <div className="container flex flex-col gap-4 py-4 lg:flex-row lg:items-center">
@@ -286,7 +286,7 @@ export default function Search() {
           <div className="relative min-w-0 flex-1">
             <SearchIcon
               size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C9A84C]"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#059669]"
             />
             <input
               type="text"
@@ -296,14 +296,14 @@ export default function Search() {
               className="h-11 w-full rounded-xl pl-10 pr-10 text-sm outline-none"
               style={{
                 background: "rgba(14,16,32,0.85)",
-                border: "1px solid rgba(201,168,76,0.18)",
-                color: "#F0EDE6",
+                border: "1px solid rgba(5,150,105,0.18)",
+                color: "#1c1917",
               }}
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8B7D6B] hover:text-[#F0EDE6]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8B7D6B] hover:text-[#1c1917]"
               >
                 <X size={14} />
               </button>
@@ -321,8 +321,8 @@ export default function Search() {
             <button
               onClick={refreshJobs}
               disabled={seedMutation.isPending}
-              className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#F0EDE6]"
-              style={{ background: "rgba(14,16,32,0.8)", border: "1px solid rgba(201,168,76,0.15)" }}
+              className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#1c1917]"
+              style={{ background: "rgba(14,16,32,0.8)", border: "1px solid rgba(5,150,105,0.15)" }}
             >
               {seedMutation.isPending
                 ? <Loader2 size={14} className="animate-spin" />
@@ -336,7 +336,7 @@ export default function Search() {
               style={{
                 background: "rgba(224,122,95,0.10)",
                 border: "1px solid rgba(224,122,95,0.20)",
-                color: "#E07A5F",
+                color: "#15803d",
               }}
             >
               {createAlertMutation.isPending
@@ -346,13 +346,13 @@ export default function Search() {
             </button>
             <button
               onClick={() => navigate("/swipe")}
-              className="rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+              className="rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#059669]"
             >
               Swipe IA
             </button>
             <button
               onClick={() => navigate("/dashboard")}
-              className="rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+              className="rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#059669]"
             >
               Dashboard
             </button>
@@ -364,12 +364,12 @@ export default function Search() {
         {/* Page title */}
         <div className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <span className="badge-gold mb-3 inline-flex">
+            <span className="badge-emerald mb-3 inline-flex">
               <Sparkles size={11} />
               Matching intelligent
             </span>
             <h1
-              className="text-3xl font-black text-[#F0EDE6]"
+              className="text-3xl font-black text-[#1c1917]"
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               Recherche d'offres
@@ -379,7 +379,7 @@ export default function Search() {
             </p>
           </div>
           <p className="text-sm text-[#8B7D6B]">
-            <span className="text-[#C9A84C] font-bold">{filteredJobs.length}</span>{" "}
+            <span className="text-[#059669] font-bold">{filteredJobs.length}</span>{" "}
             offre{filteredJobs.length !== 1 ? "s" : ""} trouvée{filteredJobs.length !== 1 ? "s" : ""}
           </p>
         </div>
@@ -393,9 +393,9 @@ export default function Search() {
                   key={key}
                   className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
                   style={{
-                    background: "rgba(201,168,76,0.12)",
-                    color: "#C9A84C",
-                    border: "1px solid rgba(201,168,76,0.25)",
+                    background: "rgba(5,150,105,0.12)",
+                    color: "#059669",
+                    border: "1px solid rgba(5,150,105,0.25)",
                   }}
                 >
                   {value}
@@ -419,16 +419,16 @@ export default function Search() {
         ) : filteredJobs.length === 0 ? (
           <div
             className="rounded-2xl py-20 text-center"
-            style={{ background: "rgba(14,16,32,0.7)", border: "1px solid rgba(201,168,76,0.10)" }}
+            style={{ background: "rgba(14,16,32,0.7)", border: "1px solid rgba(5,150,105,0.10)" }}
           >
             <div
               className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
-              style={{ background: "rgba(201,168,76,0.10)", color: "#C9A84C" }}
+              style={{ background: "rgba(5,150,105,0.10)", color: "#059669" }}
             >
               <Briefcase size={28} />
             </div>
             <h3
-              className="text-xl font-bold text-[#F0EDE6]"
+              className="text-xl font-bold text-[#1c1917]"
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               Aucune offre trouvée
@@ -437,7 +437,7 @@ export default function Search() {
             <button
               onClick={refreshJobs}
               disabled={seedMutation.isPending}
-              className="btn-gold mt-7 rounded-xl px-6 py-3 text-sm"
+              className="btn-emerald mt-7 rounded-xl px-6 py-3 text-sm"
             >
               {seedMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
               Charger les offres
@@ -473,9 +473,9 @@ function FilterDropdown({ filters, activeFilterCount, clearFilters, setFilters }
         <button
           className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all"
           style={{
-            background: activeFilterCount > 0 ? "rgba(201,168,76,0.15)" : "rgba(14,16,32,0.8)",
-            border: `1px solid ${activeFilterCount > 0 ? "rgba(201,168,76,0.35)" : "rgba(201,168,76,0.15)"}`,
-            color: activeFilterCount > 0 ? "#C9A84C" : "#8B7D6B",
+            background: activeFilterCount > 0 ? "rgba(5,150,105,0.15)" : "rgba(14,16,32,0.8)",
+            border: `1px solid ${activeFilterCount > 0 ? "rgba(5,150,105,0.35)" : "rgba(5,150,105,0.15)"}`,
+            color: activeFilterCount > 0 ? "#059669" : "#8B7D6B",
           }}
         >
           <Filter size={14} />
@@ -483,7 +483,7 @@ function FilterDropdown({ filters, activeFilterCount, clearFilters, setFilters }
           {activeFilterCount > 0 && (
             <span
               className="flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
-              style={{ background: "#C9A84C", color: "#07090F" }}
+              style={{ background: "#059669", color: "#fafafa" }}
             >
               {activeFilterCount}
             </span>
@@ -496,14 +496,14 @@ function FilterDropdown({ filters, activeFilterCount, clearFilters, setFilters }
         sideOffset={10}
         className="w-[min(92vw,560px)] rounded-2xl p-6 shadow-2xl"
         style={{
-          background: "#0E1020",
-          border: "1px solid rgba(201,168,76,0.15)",
+          background: "#ffffff",
+          border: "1px solid rgba(5,150,105,0.15)",
           boxShadow: "0 40px 80px rgba(0,0,0,0.6)",
         }}
       >
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>
-            <p className="font-bold text-[#F0EDE6]"
+            <p className="font-bold text-[#1c1917]"
                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               Filtres
             </p>
@@ -512,7 +512,7 @@ function FilterDropdown({ filters, activeFilterCount, clearFilters, setFilters }
           {activeFilterCount > 0 && (
             <button
               onClick={clearFilters}
-              className="text-xs font-bold text-[#C9A84C] hover:underline"
+              className="text-xs font-bold text-[#059669] hover:underline"
             >
               Réinitialiser
             </button>
@@ -539,7 +539,7 @@ function FilterBlock({ title, values, selected, onSelect, compact = false }: {
 }) {
   return (
     <div>
-      <p className="mb-2.5 text-xs font-black uppercase tracking-[0.15em] text-[#C9A84C]">{title}</p>
+      <p className="mb-2.5 text-xs font-black uppercase tracking-[0.15em] text-[#059669]">{title}</p>
       <div className={compact ? "flex flex-wrap gap-2" : "grid gap-1"}>
         {values.map((value) => {
           const active = selected === value;
@@ -553,12 +553,12 @@ function FilterBlock({ title, values, selected, onSelect, compact = false }: {
                   : "w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-all"
               }
               style={{
-                background: active ? "rgba(201,168,76,0.18)" : "transparent",
-                color: active ? "#C9A84C" : "#8B7D6B",
-                border: compact ? `1px solid ${active ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.12)"}` : "none",
+                background: active ? "rgba(5,150,105,0.18)" : "transparent",
+                color: active ? "#059669" : "#8B7D6B",
+                border: compact ? `1px solid ${active ? "rgba(5,150,105,0.4)" : "rgba(5,150,105,0.12)"}` : "none",
               }}
               onMouseEnter={(e) => {
-                if (!active) (e.currentTarget as HTMLButtonElement).style.color = "#F0EDE6";
+                if (!active) (e.currentTarget as HTMLButtonElement).style.color = "#1c1917";
               }}
               onMouseLeave={(e) => {
                 if (!active) (e.currentTarget as HTMLButtonElement).style.color = "#8B7D6B";

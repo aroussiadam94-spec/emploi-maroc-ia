@@ -69,9 +69,9 @@
  *
  * -------------------------------
  * ✅ SUMMARY
- * - “map-attached” → AdvancedMarkerElement, DirectionsRenderer, Layers.
- * - “standalone” → Geocoder, DirectionsService, DistanceMatrixService, ElevationService.
- * - “data-only” → Place, Geometry utilities.
+ * - "map-attached" → AdvancedMarkerElement, DirectionsRenderer, Layers.
+ * - "standalone" → Geocoder, DirectionsService, DistanceMatrixService, ElevationService.
+ * - "data-only" → Place, Geometry utilities.
  */
 
 /// <reference types="@types/google.maps" />
@@ -80,27 +80,40 @@ import { useEffect, useRef } from "react";
 import { usePersistFn } from "@/hooks/usePersistFn";
 import { cn } from "@/lib/utils";
 
+// Extend the Window type so TypeScript knows about the google.maps global
+// that is injected dynamically by the Maps script tag.
 declare global {
   interface Window {
     google?: typeof google;
   }
 }
 
+// Forge proxy is used instead of calling the Google Maps API directly so the
+// API key stays server-side and usage can be tracked/rate-limited.
 const API_KEY = import.meta.env.VITE_FRONTEND_FORGE_API_KEY;
 const FORGE_BASE_URL =
   import.meta.env.VITE_FRONTEND_FORGE_API_URL ||
   "https://forge.butterfly-effect.dev";
+// All Google Maps API requests are routed through this Forge proxy URL.
 const MAPS_PROXY_URL = `${FORGE_BASE_URL}/v1/maps/proxy`;
 
+/**
+ * Dynamically injects the Google Maps JavaScript API script tag.
+ * Loads the marker, places, geocoding, and geometry libraries at once.
+ * Returns a Promise that resolves when the script has finished loading.
+ * The script element is removed from the DOM after load to keep things tidy
+ * (the global `google` object persists in memory regardless).
+ */
 function loadMapScript() {
   return new Promise(resolve => {
     const script = document.createElement("script");
+    // All four libraries are loaded in one request to minimise round trips.
     script.src = `${MAPS_PROXY_URL}/maps/api/js?key=${API_KEY}&v=weekly&libraries=marker,places,geocoding,geometry`;
     script.async = true;
     script.crossOrigin = "anonymous";
     script.onload = () => {
       resolve(null);
-      script.remove(); // Clean up immediately
+      script.remove(); // Clean up immediately – google global is already available.
     };
     script.onerror = () => {
       console.error("Failed to load Google Maps script");
@@ -109,28 +122,48 @@ function loadMapScript() {
   });
 }
 
+// Props accepted by the MapView component.
 interface MapViewProps {
   className?: string;
+  /** Latitude/longitude to centre the map on initially. */
   initialCenter?: google.maps.LatLngLiteral;
+  /** Default zoom level (1 = world, 20 = building). */
   initialZoom?: number;
+  /**
+   * Called after the map has been created and is ready to use.
+   * Store the map instance in a ref to control it from the parent.
+   */
   onMapReady?: (map: google.maps.Map) => void;
 }
 
+/**
+ * Renders an embedded Google Map inside a div container.
+ * The map script is loaded lazily on mount so it does not delay the initial page load.
+ *
+ * @example
+ * const mapRef = useRef<google.maps.Map | null>(null);
+ * <MapView initialCenter={{ lat: 33.5731, lng: -7.5898 }} onMapReady={m => mapRef.current = m} />
+ */
 export function MapView({
   className,
-  initialCenter = { lat: 37.7749, lng: -122.4194 },
+  initialCenter = { lat: 37.7749, lng: -122.4194 }, // Default: San Francisco
   initialZoom = 12,
   onMapReady,
 }: MapViewProps) {
+  // Ref to the DOM element that Google Maps will render into.
   const mapContainer = useRef<HTMLDivElement>(null);
+  // Ref to the google.maps.Map instance so it persists without causing re-renders.
   const map = useRef<google.maps.Map | null>(null);
 
+  // Stable async initialiser – loads the script and then creates the map instance.
   const init = usePersistFn(async () => {
+    // Wait for the Google Maps script to finish loading.
     await loadMapScript();
     if (!mapContainer.current) {
       console.error("Map container not found");
       return;
     }
+    // Instantiate the Google Map inside the container div.
     map.current = new window.google.maps.Map(mapContainer.current, {
       zoom: initialZoom,
       center: initialCenter,
@@ -138,17 +171,20 @@ export function MapView({
       fullscreenControl: true,
       zoomControl: true,
       streetViewControl: true,
-      mapId: "DEMO_MAP_ID",
+      mapId: "DEMO_MAP_ID", // Required for Advanced Markers API.
     });
+    // Notify the parent so it can attach markers or other overlays.
     if (onMapReady) {
       onMapReady(map.current);
     }
   });
 
+  // Initialise the map once after the component mounts.
   useEffect(() => {
     init();
   }, [init]);
 
+  // The map renders inside this div. The height can be customised via className.
   return (
     <div ref={mapContainer} className={cn("w-full h-[500px]", className)} />
   );

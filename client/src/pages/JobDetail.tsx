@@ -55,12 +55,12 @@ export default function JobDetail() {
 
   if (isLoading) {
     return (
-      <div className="app-shell flex min-h-screen items-center justify-center" style={{ background: "#07090F" }}>
+      <div className="app-shell flex min-h-screen items-center justify-center" style={{ background: "#fafafa" }}>
         <div
           className="flex items-center gap-3 rounded-2xl px-7 py-5 text-[#8B7D6B]"
-          style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.12)" }}
+          style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.12)" }}
         >
-          <Loader2 size={16} className="animate-spin text-[#C9A84C]" />
+          <Loader2 size={16} className="animate-spin text-[#059669]" />
           Chargement de l'offre...
         </div>
       </div>
@@ -69,20 +69,20 @@ export default function JobDetail() {
 
   if (!job) {
     return (
-      <div className="app-shell flex min-h-screen items-center justify-center p-4" style={{ background: "#07090F" }}>
+      <div className="app-shell flex min-h-screen items-center justify-center p-4" style={{ background: "#fafafa" }}>
         <div
           className="max-w-md rounded-2xl p-8 text-center"
-          style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.12)" }}
+          style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.12)" }}
         >
-          <AlertCircle size={40} className="mx-auto mb-4 text-[#E07A5F]" />
-          <h2 className="text-2xl font-black text-[#F0EDE6]"
+          <AlertCircle size={40} className="mx-auto mb-4 text-[#15803d]" />
+          <h2 className="text-2xl font-black text-[#1c1917]"
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
             Offre non trouvée
           </h2>
           <p className="mt-3 text-[#8B7D6B]">L'offre n'existe pas ou a été supprimée.</p>
           <button
             onClick={() => navigate("/search")}
-            className="btn-gold mt-7 w-full rounded-xl py-3 text-sm"
+            className="btn-emerald mt-7 w-full rounded-xl py-3 text-sm"
           >
             Retour à la recherche
           </button>
@@ -95,16 +95,16 @@ export default function JobDetail() {
   const skills = Array.isArray(job.skills) ? job.skills : [];
 
   return (
-    <div className="app-shell min-h-screen" style={{ background: "#07090F" }}>
+    <div className="app-shell min-h-screen" style={{ background: "#fafafa" }}>
       {/* Header */}
-      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
+      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(5,150,105,0.12)" }}>
         <div className="container py-5">
           <div className="mb-5 flex items-center justify-between">
             <BrandLogo onClick={() => navigate("/")} />
           </div>
           <button
             onClick={() => navigate("/search")}
-            className="mb-5 flex items-center gap-2 text-sm text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+            className="mb-5 flex items-center gap-2 text-sm text-[#8B7D6B] transition-colors hover:text-[#059669]"
           >
             <ArrowLeft size={15} /> Retour à la recherche
           </button>
@@ -112,12 +112,12 @@ export default function JobDetail() {
           <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
             <div style={{ animation: "rise-in 600ms cubic-bezier(0.22,1,0.36,1) both" }}>
               {job.contractType && (
-                <span className="badge-gold mb-4 inline-flex">
+                <span className="badge-emerald mb-4 inline-flex">
                   <Briefcase size={11} /> {job.contractType}
                 </span>
               )}
               <h1
-                className="max-w-4xl text-3xl font-black leading-tight tracking-tight text-[#F0EDE6] md:text-5xl"
+                className="max-w-4xl text-3xl font-black leading-tight tracking-tight text-[#1c1917] md:text-5xl"
                 style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
               >
                 {job.title}
@@ -179,7 +179,7 @@ export default function JobDetail() {
             ) : (
               <button
                 onClick={() => setIsApplyModalOpen(true)}
-                className="btn-gold rounded-xl px-7 py-3 text-sm"
+                className="btn-emerald rounded-xl px-7 py-3 text-sm"
               >
                 Postuler maintenant <ArrowLeft size={15} className="rotate-180" />
               </button>
@@ -190,16 +190,16 @@ export default function JobDetail() {
               className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all"
               style={{
                 background: isSaved ? "rgba(224,122,95,0.12)" : "rgba(14,16,32,0.8)",
-                color: isSaved ? "#E07A5F" : "#8B7D6B",
-                border: `1px solid ${isSaved ? "rgba(224,122,95,0.25)" : "rgba(201,168,76,0.15)"}`,
+                color: isSaved ? "#15803d" : "#8B7D6B",
+                border: `1px solid ${isSaved ? "rgba(224,122,95,0.25)" : "rgba(5,150,105,0.15)"}`,
               }}
             >
               <Heart size={15} className={isSaved ? "fill-current" : ""} />
               {isSaved ? "Sauvegardée" : "Sauvegarder"}
             </button>
             <button
-              className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#F0EDE6]"
-              style={{ background: "rgba(14,16,32,0.8)", border: "1px solid rgba(201,168,76,0.15)" }}
+              className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#1c1917]"
+              style={{ background: "rgba(14,16,32,0.8)", border: "1px solid rgba(5,150,105,0.15)" }}
             >
               <Share2 size={15} /> Partager
             </button>
@@ -214,17 +214,17 @@ export default function JobDetail() {
           {matchingScore !== null && (
             <div
               className="rounded-2xl p-6"
-              style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(201,168,76,0.12)" }}
+              style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(5,150,105,0.12)" }}
             >
               <div className="flex gap-4">
                 <div
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-                  style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C" }}
+                  style={{ background: "rgba(5,150,105,0.12)", color: "#059669" }}
                 >
                   <Sparkles size={20} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-[#F0EDE6]"
+                  <h2 className="text-lg font-bold text-[#1c1917]"
                       style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                     Pourquoi ce match ?
                   </h2>
@@ -243,9 +243,9 @@ export default function JobDetail() {
           {skills.length > 0 && (
             <div
               className="rounded-2xl p-6"
-              style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(201,168,76,0.12)" }}
+              style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(5,150,105,0.12)" }}
             >
-              <h2 className="mb-5 text-xl font-bold text-[#F0EDE6]"
+              <h2 className="mb-5 text-xl font-bold text-[#1c1917]"
                   style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                 Compétences requises
               </h2>
@@ -268,9 +268,9 @@ export default function JobDetail() {
         <aside>
           <div
             className="sticky top-6 rounded-2xl p-6"
-            style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.14)" }}
+            style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.14)" }}
           >
-            <h3 className="mb-5 text-lg font-bold text-[#F0EDE6]"
+            <h3 className="mb-5 text-lg font-bold text-[#1c1917]"
                 style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               Informations
             </h3>
@@ -292,7 +292,7 @@ export default function JobDetail() {
               ) : (
                 <button
                   onClick={() => setIsApplyModalOpen(true)}
-                  className="btn-gold w-full rounded-xl py-3 text-sm"
+                  className="btn-emerald w-full rounded-xl py-3 text-sm"
                 >
                   Postuler maintenant
                 </button>
@@ -300,7 +300,7 @@ export default function JobDetail() {
               {job.sourceUrl && (
                 <button
                   onClick={() => window.open(job.sourceUrl, "_blank")}
-                  className="btn-outline-gold w-full rounded-xl py-3 text-sm"
+                  className="btn-outline-emerald w-full rounded-xl py-3 text-sm"
                 >
                   Voir l'offre originale <ExternalLink size={14} />
                 </button>
@@ -315,15 +315,15 @@ export default function JobDetail() {
         <DialogContent
           className="sm:max-w-[440px] rounded-2xl p-8"
           style={{
-            background: "#0E1020",
-            border: "1px solid rgba(201,168,76,0.20)",
+            background: "#ffffff",
+            border: "1px solid rgba(5,150,105,0.20)",
             boxShadow: "0 40px 80px rgba(0,0,0,0.6)",
-            color: "#F0EDE6",
+            color: "#1c1917",
           }}
         >
           <DialogHeader>
             <DialogTitle
-              className="text-xl font-black text-[#F0EDE6]"
+              className="text-xl font-black text-[#1c1917]"
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               Postuler pour ce poste
@@ -338,10 +338,10 @@ export default function JobDetail() {
               className="rounded-2xl p-8 text-center cursor-pointer transition-all"
               style={{
                 border: cvFile
-                  ? "2px solid rgba(201,168,76,0.50)"
-                  : "2px dashed rgba(201,168,76,0.20)",
+                  ? "2px solid rgba(5,150,105,0.50)"
+                  : "2px dashed rgba(5,150,105,0.20)",
                 background: cvFile
-                  ? "rgba(201,168,76,0.06)"
+                  ? "rgba(5,150,105,0.06)"
                   : "rgba(14,16,32,0.5)",
               }}
               onClick={() => fileInputRef.current?.click()}
@@ -356,16 +356,16 @@ export default function JobDetail() {
               <UploadCloud
                 size={36}
                 className="mx-auto mb-3"
-                style={{ color: cvFile ? "#C9A84C" : "#8B7D6B" }}
+                style={{ color: cvFile ? "#059669" : "#8B7D6B" }}
               />
               {cvFile ? (
                 <>
-                  <p className="text-sm font-semibold text-[#F0EDE6]">{cvFile.name}</p>
+                  <p className="text-sm font-semibold text-[#1c1917]">{cvFile.name}</p>
                   <p className="mt-1 text-xs text-[#8B7D6B]">Cliquez pour modifier</p>
                 </>
               ) : (
                 <>
-                  <p className="text-sm font-medium text-[#F0EDE6]">Cliquez pour ajouter votre CV</p>
+                  <p className="text-sm font-medium text-[#1c1917]">Cliquez pour ajouter votre CV</p>
                   <p className="mt-1 text-xs text-[#8B7D6B]">PDF, DOC, DOCX jusqu'à 5MB</p>
                 </>
               )}
@@ -375,14 +375,14 @@ export default function JobDetail() {
           <div className="flex gap-3">
             <button
               onClick={() => setIsApplyModalOpen(false)}
-              className="btn-outline-gold flex-1 rounded-xl py-3 text-sm"
+              className="btn-outline-emerald flex-1 rounded-xl py-3 text-sm"
             >
               Annuler
             </button>
             <button
               onClick={handleApply}
               disabled={applyMutation.isPending || !cvFile}
-              className="btn-gold flex-1 rounded-xl py-3 text-sm disabled:opacity-50"
+              className="btn-emerald flex-1 rounded-xl py-3 text-sm disabled:opacity-50"
             >
               {applyMutation.isPending ? (
                 <><Loader2 size={14} className="animate-spin" /> Envoi...</>
@@ -399,9 +399,9 @@ function MetaTag({ icon: Icon, text }: { icon: any; text: string }) {
   return (
     <span
       className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm"
-      style={{ background: "rgba(30,35,56,0.8)", color: "#8B7D6B", border: "1px solid rgba(201,168,76,0.12)" }}
+      style={{ background: "rgba(30,35,56,0.8)", color: "#8B7D6B", border: "1px solid rgba(5,150,105,0.12)" }}
     >
-      <Icon size={14} className="text-[#C9A84C]" /> {text}
+      <Icon size={14} className="text-[#059669]" /> {text}
     </span>
   );
 }
@@ -409,10 +409,10 @@ function MetaTag({ icon: Icon, text }: { icon: any; text: string }) {
 function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
   return (
     <div className="flex gap-3">
-      <Icon size={16} className="mt-0.5 shrink-0 text-[#C9A84C]" />
+      <Icon size={16} className="mt-0.5 shrink-0 text-[#059669]" />
       <div>
         <p className="text-xs font-black uppercase tracking-[0.15em] text-[#8B7D6B]">{label}</p>
-        <p className="mt-0.5 text-sm font-semibold capitalize text-[#F0EDE6]">{value}</p>
+        <p className="mt-0.5 text-sm font-semibold capitalize text-[#1c1917]">{value}</p>
       </div>
     </div>
   );
@@ -422,9 +422,9 @@ function ContentSection({ title, text }: { title: string; text: string }) {
   return (
     <div
       className="rounded-2xl p-6"
-      style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(201,168,76,0.12)" }}
+      style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(5,150,105,0.12)" }}
     >
-      <h2 className="mb-4 text-xl font-bold text-[#F0EDE6]"
+      <h2 className="mb-4 text-xl font-bold text-[#1c1917]"
           style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
         {title}
       </h2>

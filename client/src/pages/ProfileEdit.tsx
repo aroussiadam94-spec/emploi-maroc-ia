@@ -110,18 +110,18 @@ export default function ProfileEdit() {
 
   if (!isAuthenticated) {
     return (
-      <div className="app-shell flex min-h-screen items-center justify-center p-4" style={{ background: "#07090F" }}>
-        <div className="max-w-md rounded-2xl p-10 text-center" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 40px 80px rgba(0,0,0,0.5)" }}>
-          <h2 className="mb-4 text-2xl font-black text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Connexion requise</h2>
-          <button onClick={() => navigate("/")} className="btn-gold w-full rounded-xl py-3 text-sm">Retour à l'accueil</button>
+      <div className="app-shell flex min-h-screen items-center justify-center p-4" style={{ background: "#fafafa" }}>
+        <div className="max-w-md rounded-2xl p-10 text-center" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.15)", boxShadow: "0 40px 80px rgba(0,0,0,0.5)" }}>
+          <h2 className="mb-4 text-2xl font-black text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Connexion requise</h2>
+          <button onClick={() => navigate("/")} className="btn-emerald w-full rounded-xl py-3 text-sm">Retour à l'accueil</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="app-shell min-h-screen" style={{ background: "#07090F" }}>
-      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
+    <div className="app-shell min-h-screen" style={{ background: "#fafafa" }}>
+      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(5,150,105,0.12)" }}>
         <div className="container py-6">
           <div className="mb-6 flex items-center justify-between">
             <BrandLogo onClick={() => navigate("/")} />
@@ -129,17 +129,17 @@ export default function ProfileEdit() {
           
           <button
             onClick={() => navigate("/dashboard")}
-            className="mb-5 flex items-center gap-2 text-sm text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+            className="mb-5 flex items-center gap-2 text-sm text-[#8B7D6B] transition-colors hover:text-[#059669]"
           >
             <ArrowLeft size={15} /> Retour au tableau de bord
           </button>
           
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C" }}>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "rgba(5,150,105,0.12)", color: "#059669" }}>
               <UserRound size={24} />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+              <h1 className="text-3xl font-black tracking-tight text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                 Modifier mon profil
               </h1>
               <p className="mt-1 text-sm text-[#8B7D6B]">Gardez vos informations à jour pour améliorer le matching IA.</p>
@@ -149,7 +149,7 @@ export default function ProfileEdit() {
       </header>
 
       <main className="container py-8">
-        <div className="mx-auto max-w-3xl rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
+        <div className="mx-auto max-w-3xl rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.15)", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
           <form onSubmit={handleSubmit} className="space-y-8">
             
             <div className="grid gap-6 md:grid-cols-2">
@@ -159,7 +159,7 @@ export default function ProfileEdit() {
                   value={user?.name || ""}
                   disabled
                   className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.08)", color: "#8B7D6B" }}
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(5,150,105,0.08)", color: "#8B7D6B" }}
                 />
               </Field>
               <Field label="Email" hint="Fourni par votre compte">
@@ -168,7 +168,7 @@ export default function ProfileEdit() {
                   value={user?.email || ""}
                   disabled
                   className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.08)", color: "#8B7D6B" }}
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(5,150,105,0.08)", color: "#8B7D6B" }}
                 />
               </Field>
               <Field label="Téléphone">
@@ -177,8 +177,8 @@ export default function ProfileEdit() {
                   placeholder="+212 6XX XXX XXX"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#C9A84C]/50"
-                  style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(201,168,76,0.2)", color: "#F0EDE6" }}
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#059669]/50"
+                  style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(5,150,105,0.2)", color: "#1c1917" }}
                 />
               </Field>
               <Field label="Localisation">
@@ -187,8 +187,8 @@ export default function ProfileEdit() {
                   placeholder="Casablanca, Maroc"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#C9A84C]/50"
-                  style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(201,168,76,0.2)", color: "#F0EDE6" }}
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#059669]/50"
+                  style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(5,150,105,0.2)", color: "#1c1917" }}
                 />
               </Field>
             </div>
@@ -199,31 +199,31 @@ export default function ProfileEdit() {
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 rows={4}
-                className="w-full resize-none rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#C9A84C]/50"
-                style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(201,168,76,0.2)", color: "#F0EDE6" }}
+                className="w-full resize-none rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#059669]/50"
+                style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(5,150,105,0.2)", color: "#1c1917" }}
               />
             </Field>
 
             {/* CV Section */}
-            <div className="border-t border-[rgba(201,168,76,0.12)] pt-8">
-              <h3 className="mb-4 text-lg font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Mon CV (PDF, DOC)</h3>
+            <div className="border-t border-[rgba(5,150,105,0.12)] pt-8">
+              <h3 className="mb-4 text-lg font-bold text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Mon CV (PDF, DOC)</h3>
               
               {(profile as any)?.cvUrl && (profile as any)?.cvFileName ? (
                 <div
                   className="flex items-center justify-between rounded-2xl p-5"
-                  style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}
+                  style={{ background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.15)" }}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(5,150,105,0.15)", color: "#059669" }}>
                       <FileText size={20} />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-[#F0EDE6]">{(profile as any).cvFileName}</p>
+                      <p className="text-sm font-bold text-[#1c1917]">{(profile as any).cvFileName}</p>
                       <a 
                         href={(profile as any).cvUrl} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="text-xs font-semibold text-[#C9A84C] hover:underline"
+                        className="text-xs font-semibold text-[#059669] hover:underline"
                       >
                         Afficher le document
                       </a>
@@ -233,7 +233,7 @@ export default function ProfileEdit() {
                     type="button"
                     onClick={handleRemoveCv}
                     disabled={removeCvMutation.isPending}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[#E07A5F] transition-colors hover:bg-[rgba(224,122,95,0.1)]"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[#15803d] transition-colors hover:bg-[rgba(224,122,95,0.1)]"
                   >
                     {removeCvMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
                   </button>
@@ -243,24 +243,24 @@ export default function ProfileEdit() {
                   {...getRootProps()}
                   className="cursor-pointer rounded-2xl border-2 border-dashed p-10 text-center transition-all"
                   style={{
-                    borderColor: isDragActive ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.15)",
-                    background: isDragActive ? "rgba(201,168,76,0.05)" : "transparent"
+                    borderColor: isDragActive ? "rgba(5,150,105,0.5)" : "rgba(5,150,105,0.15)",
+                    background: isDragActive ? "rgba(5,150,105,0.05)" : "transparent"
                   }}
                 >
                   <input {...getInputProps()} />
                   {cvUploading || uploadCvMutation.isPending ? (
                     <div className="flex flex-col items-center">
-                      <Loader2 size={32} className="mb-4 animate-spin text-[#C9A84C]" />
-                      <p className="font-semibold text-[#C9A84C]">Téléchargement en cours...</p>
+                      <Loader2 size={32} className="mb-4 animate-spin text-[#059669]" />
+                      <p className="font-semibold text-[#059669]">Téléchargement en cours...</p>
                     </div>
                   ) : (
                     <>
-                      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: "rgba(201,168,76,0.10)", color: "#C9A84C" }}>
+                      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: "rgba(5,150,105,0.10)", color: "#059669" }}>
                         <UploadCloud size={24} />
                       </div>
-                      <p className="mb-2 text-sm font-bold text-[#F0EDE6]">Glissez-déposez votre CV ici</p>
+                      <p className="mb-2 text-sm font-bold text-[#1c1917]">Glissez-déposez votre CV ici</p>
                       <p className="mb-6 text-xs text-[#8B7D6B]">ou cliquez pour parcourir (Max 5MB)</p>
-                      <button type="button" className="btn-outline-gold rounded-xl px-5 py-2.5 text-sm pointer-events-none">
+                      <button type="button" className="btn-outline-emerald rounded-xl px-5 py-2.5 text-sm pointer-events-none">
                         Sélectionner un fichier
                       </button>
                     </>
@@ -272,12 +272,12 @@ export default function ProfileEdit() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 border-t border-[rgba(201,168,76,0.12)] pt-6 sm:flex-row">
-              <button type="submit" disabled={loading} className="btn-gold flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm">
+            <div className="flex flex-col gap-3 border-t border-[rgba(5,150,105,0.12)] pt-6 sm:flex-row">
+              <button type="submit" disabled={loading} className="btn-emerald flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm">
                 {loading ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
                 {loading ? "Enregistrement..." : "Enregistrer les modifications"}
               </button>
-              <button type="button" onClick={() => navigate("/dashboard")} className="btn-outline-gold rounded-xl px-7 py-3 text-sm">
+              <button type="button" onClick={() => navigate("/dashboard")} className="btn-outline-emerald rounded-xl px-7 py-3 text-sm">
                 Annuler
               </button>
             </div>
@@ -291,7 +291,7 @@ export default function ProfileEdit() {
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-bold text-[#F0EDE6]">{label}</span>
+      <span className="mb-2 block text-sm font-bold text-[#1c1917]">{label}</span>
       {children}
       {hint && <span className="mt-1.5 block text-xs font-medium text-[#8B7D6B]">{hint}</span>}
     </label>

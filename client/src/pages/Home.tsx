@@ -20,8 +20,8 @@ declare global {
 /* ── Data ── */
 const CATEGORIES = [
   { icon: Code2,       label: "Technologie & IT",  count: "1,240+", color: "#7BA7BC" },
-  { icon: TrendingUp,  label: "Finance & Banque",  count: "820+",   color: "#C9A84C" },
-  { icon: Megaphone,   label: "Marketing",          count: "650+",   color: "#E07A5F" },
+  { icon: TrendingUp,  label: "Finance & Banque",  count: "820+",   color: "#059669" },
+  { icon: Megaphone,   label: "Marketing",          count: "650+",   color: "#15803d" },
   { icon: Settings,    label: "Ingénierie",         count: "930+",   color: "#A78BFA" },
   { icon: Heart,       label: "Santé",              count: "470+",   color: "#34D399" },
   { icon: BookOpen,    label: "Éducation",          count: "380+",   color: "#F59E0B" },
@@ -50,7 +50,7 @@ const FEATURED_JOBS = [
     location: "Rabat",
     salary: "14 000 – 20 000 MAD",
     tag: "CDI",
-    tagColor: "#C9A84C",
+    tagColor: "#059669",
     initial: "M",
     color: "#4a3a1a",
   },
@@ -320,7 +320,7 @@ function CategoryCard({ cat, delay }: { cat: typeof CATEGORIES[0]; delay: number
           <Icon size={22} />
         </div>
         <p
-          className="text-base font-semibold text-[#F0EDE6]"
+          className="text-base font-semibold text-[#1c1917]"
           style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
         >
           {cat.label}
@@ -345,7 +345,7 @@ function JobCard({ job, delay }: { job: typeof FEATURED_JOBS[0]; delay: number }
             {job.initial}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="line-clamp-2 font-semibold leading-snug text-[#F0EDE6] transition-colors group-hover:text-[#C9A84C]"
+            <p className="line-clamp-2 font-semibold leading-snug text-[#1c1917] transition-colors group-hover:text-[#059669]"
                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               {job.title}
             </p>
@@ -353,10 +353,10 @@ function JobCard({ job, delay }: { job: typeof FEATURED_JOBS[0]; delay: number }
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-2 text-xs">
-          <span className="flex items-center gap-1 rounded-full bg-[#1E2338] px-3 py-1 text-[#8B7D6B]">
+          <span className="flex items-center gap-1 rounded-full bg-[#f5f5f4] px-3 py-1 text-[#8B7D6B]">
             <MapPin size={11} /> {job.location}
           </span>
-          <span className="rounded-full bg-[#1E2338] px-3 py-1 text-[#8B7D6B]">
+          <span className="rounded-full bg-[#f5f5f4] px-3 py-1 text-[#8B7D6B]">
             {job.salary}
           </span>
         </div>
@@ -367,7 +367,7 @@ function JobCard({ job, delay }: { job: typeof FEATURED_JOBS[0]; delay: number }
           >
             {job.tag}
           </span>
-          <span className="flex items-center gap-1 text-xs font-semibold text-[#C9A84C] transition-all group-hover:gap-2">
+          <span className="flex items-center gap-1 text-xs font-semibold text-[#059669] transition-all group-hover:gap-2">
             Voir l'offre <ArrowRight size={12} />
           </span>
         </div>
@@ -451,7 +451,7 @@ export default function Home() {
   const headline = "Trouvez Votre Prochaine Opportunité au Maroc";
 
   return (
-    <div className="app-shell" style={{ background: "#07090F" }}>
+    <div className="app-shell" style={{ background: "#fafafa" }}>
       {/* ── Custom Cursor ── */}
       <div id="custom-cursor" />
 
@@ -474,7 +474,7 @@ export default function Home() {
               <button
                 key={label}
                 onClick={action}
-                className="text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+                className="text-[#8B7D6B] transition-colors hover:text-[#059669]"
               >
                 {label}
               </button>
@@ -485,11 +485,11 @@ export default function Home() {
             {isAuthenticated ? (
               <>
                 <span className="hidden text-sm text-[#8B7D6B] sm:inline">
-                  Bonjour, <span className="text-[#C9A84C]">{user?.name?.split(" ")[0]}</span>
+                  Bonjour, <span className="text-[#059669]">{user?.name?.split(" ")[0]}</span>
                 </span>
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="btn-gold rounded-lg px-5 py-2.5 text-sm"
+                  className="btn-emerald rounded-lg px-5 py-2.5 text-sm"
                 >
                   Ouvrir
                 </button>
@@ -497,7 +497,7 @@ export default function Home() {
             ) : (
               <button
                 onClick={() => (window.location.href = getLoginUrl())}
-                className="btn-gold rounded-lg px-5 py-2.5 text-sm"
+                className="btn-emerald rounded-lg px-5 py-2.5 text-sm"
               >
                 Connexion
               </button>
@@ -511,7 +511,7 @@ export default function Home() {
               {[0, 1, 2].map((i) => (
                 <span
                   key={i}
-                  className="block h-0.5 w-5 rounded bg-[#C9A84C] transition-all"
+                  className="block h-0.5 w-5 rounded bg-[#059669] transition-all"
                 />
               ))}
             </button>
@@ -520,7 +520,7 @@ export default function Home() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="border-t border-[#C9A84C]/10 bg-[#0C0E18] px-6 pb-4 md:hidden">
+          <div className="border-t border-[#059669]/10 bg-[#ffffff] px-6 pb-4 md:hidden">
             {[
               { label: "Offres",          action: () => navigate("/search") },
               { label: "Swipe IA",        action: () => requireAuth("/swipe") },
@@ -530,7 +530,7 @@ export default function Home() {
               <button
                 key={label}
                 onClick={() => { action(); setMenuOpen(false); }}
-                className="block w-full py-3 text-left text-sm text-[#8B7D6B] hover:text-[#C9A84C]"
+                className="block w-full py-3 text-left text-sm text-[#8B7D6B] hover:text-[#059669]"
               >
                 {label}
               </button>
@@ -581,7 +581,7 @@ export default function Home() {
             <div className="max-w-5xl">
               {/* Badge */}
               <div className="hero-sub mb-6 opacity-0">
-                <span className="badge-gold">
+                <span className="badge-emerald">
                   <Star size={11} />
                   Plateforme N°1 Emploi au Maroc
                 </span>
@@ -602,7 +602,7 @@ export default function Home() {
                     className="hero-char inline-block"
                     style={{
                       opacity: 0,
-                      color: char === " " ? "transparent" : "#F0EDE6",
+                      color: char === " " ? "transparent" : "#1c1917",
                       display: char === " " ? "inline" : "inline-block",
                       whiteSpace: char === " " ? "pre" : undefined,
                     }}
@@ -627,29 +627,29 @@ export default function Home() {
                 <div
                   className="glass-panel flex max-w-3xl flex-col gap-3 rounded-2xl p-3 sm:flex-row sm:items-center"
                 >
-                  <label className="flex flex-1 items-center gap-3 rounded-xl border border-[#C9A84C]/15 bg-[#0C0E18]/80 px-4 py-3.5 focus-within:border-[#C9A84C]/40 transition-colors">
-                    <Search size={18} className="shrink-0 text-[#C9A84C]" />
+                  <label className="flex flex-1 items-center gap-3 rounded-xl border border-[#059669]/15 bg-[#ffffff]/80 px-4 py-3.5 focus-within:border-[#059669]/40 transition-colors">
+                    <Search size={18} className="shrink-0 text-[#059669]" />
                     <input
                       type="text"
                       value={searchVal}
                       onChange={(e) => setSearchVal(e.target.value)}
                       placeholder={placeholder}
-                      className="w-full bg-transparent text-sm text-[#F0EDE6] outline-none placeholder:text-[#8B7D6B]/60"
+                      className="w-full bg-transparent text-sm text-[#1c1917] outline-none placeholder:text-[#8B7D6B]/60"
                       onKeyDown={(e) => e.key === "Enter" && requireAuth("/search")}
                     />
                   </label>
-                  <label className="flex items-center gap-3 rounded-xl border border-[#C9A84C]/15 bg-[#0C0E18]/80 px-4 py-3.5 focus-within:border-[#C9A84C]/40 transition-colors sm:w-44">
-                    <MapPin size={16} className="shrink-0 text-[#E07A5F]" />
+                  <label className="flex items-center gap-3 rounded-xl border border-[#059669]/15 bg-[#ffffff]/80 px-4 py-3.5 focus-within:border-[#059669]/40 transition-colors sm:w-44">
+                    <MapPin size={16} className="shrink-0 text-[#15803d]" />
                     <input
                       type="text"
                       placeholder="Ville"
-                      className="w-full bg-transparent text-sm text-[#F0EDE6] outline-none placeholder:text-[#8B7D6B]/60"
+                      className="w-full bg-transparent text-sm text-[#1c1917] outline-none placeholder:text-[#8B7D6B]/60"
                     />
                   </label>
                   <button
                     ref={ctaRef1}
                     onClick={() => requireAuth("/search")}
-                    className="btn-gold rounded-xl px-7 py-3.5 text-sm"
+                    className="btn-emerald rounded-xl px-7 py-3.5 text-sm"
                     style={{ transition: "transform 200ms ease, box-shadow 200ms ease, background-position 400ms ease" }}
                   >
                     Rechercher
@@ -663,7 +663,7 @@ export default function Home() {
                 <button
                   ref={ctaRef2}
                   onClick={() => requireAuth("/search")}
-                  className="btn-gold rounded-xl px-7 py-3.5 text-base"
+                  className="btn-emerald rounded-xl px-7 py-3.5 text-base"
                   style={{ transition: "transform 200ms ease, box-shadow 200ms ease, background-position 400ms ease" }}
                 >
                   Commencer ma recherche
@@ -671,7 +671,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => requireAuth("/cv/upload")}
-                  className="btn-outline-gold rounded-xl px-7 py-3.5 text-base"
+                  className="btn-outline-emerald rounded-xl px-7 py-3.5 text-base"
                 >
                   Analyser mon CV
                 </button>
@@ -681,7 +681,7 @@ export default function Home() {
 
           {/* Scroll indicator */}
           <div className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 animate-bounce opacity-50">
-            <ChevronDown size={24} className="text-[#C9A84C]" />
+            <ChevronDown size={24} className="text-[#059669]" />
           </div>
         </section>
 
@@ -689,7 +689,7 @@ export default function Home() {
         <section
           ref={statsRef}
           aria-label="Statistiques"
-          style={{ background: "rgba(10,11,18,0.95)", borderTop: "1px solid rgba(201,168,76,0.12)", borderBottom: "1px solid rgba(201,168,76,0.12)" }}
+          style={{ background: "rgba(10,11,18,0.95)", borderTop: "1px solid rgba(5,150,105,0.12)", borderBottom: "1px solid rgba(5,150,105,0.12)" }}
         >
           <div className="container py-14">
             <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
@@ -705,12 +705,12 @@ export default function Home() {
           <div className="container">
             <div className="mb-14 text-center">
               <div className="reveal mb-5 flex justify-center">
-                <span className="badge-gold">
+                <span className="badge-emerald">
                   <Briefcase size={11} />
                   Explorez par secteur
                 </span>
               </div>
-              <h2 className="reveal text-4xl font-black text-[#F0EDE6] md:text-5xl" style={{ transitionDelay: "100ms" }}>
+              <h2 className="reveal text-4xl font-black text-[#1c1917] md:text-5xl" style={{ transitionDelay: "100ms" }}>
                 Tous les secteurs du marché
               </h2>
               <p className="reveal mx-auto mt-4 max-w-xl text-[#8B7D6B]" style={{ transitionDelay: "200ms" }}>
@@ -736,18 +736,18 @@ export default function Home() {
             <div className="mb-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <div className="reveal mb-5">
-                  <span className="badge-terracotta">
+                  <span className="badge-olive">
                     <Star size={11} />
                     Offres en vedette
                   </span>
                 </div>
-                <h2 className="reveal text-4xl font-black text-[#F0EDE6] md:text-5xl" style={{ transitionDelay: "100ms" }}>
+                <h2 className="reveal text-4xl font-black text-[#1c1917] md:text-5xl" style={{ transitionDelay: "100ms" }}>
                   Opportunités du moment
                 </h2>
               </div>
               <button
                 onClick={() => requireAuth("/search")}
-                className="reveal btn-outline-gold self-start rounded-xl px-5 py-2.5 text-sm sm:self-auto"
+                className="reveal btn-outline-emerald self-start rounded-xl px-5 py-2.5 text-sm sm:self-auto"
                 style={{ transitionDelay: "200ms" }}
               >
                 Voir toutes les offres <ArrowRight size={14} />
@@ -767,12 +767,12 @@ export default function Home() {
           <div className="container">
             <div className="mb-16 text-center">
               <div className="reveal mb-5 flex justify-center">
-                <span className="badge-gold">
+                <span className="badge-emerald">
                   <CheckCircle size={11} />
                   Simple & Rapide
                 </span>
               </div>
-              <h2 className="reveal text-4xl font-black text-[#F0EDE6] md:text-5xl" style={{ transitionDelay: "100ms" }}>
+              <h2 className="reveal text-4xl font-black text-[#1c1917] md:text-5xl" style={{ transitionDelay: "100ms" }}>
                 Comment ça marche
               </h2>
               <p className="reveal mx-auto mt-4 max-w-lg text-[#8B7D6B]" style={{ transitionDelay: "200ms" }}>
@@ -784,7 +784,7 @@ export default function Home() {
               {/* Connecting line */}
               <div
                 className="absolute left-1/2 top-10 hidden h-0.5 w-2/3 -translate-x-1/2 md:block"
-                style={{ background: "linear-gradient(to right, transparent, rgba(201,168,76,0.3), transparent)" }}
+                style={{ background: "linear-gradient(to right, transparent, rgba(5,150,105,0.3), transparent)" }}
               />
 
               {STEPS.map((step, i) => {
@@ -800,20 +800,20 @@ export default function Home() {
                       <div
                         className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
                         style={{
-                          background: "rgba(201,168,76,0.10)",
-                          border: "1px solid rgba(201,168,76,0.25)",
-                          boxShadow: "0 0 30px rgba(201,168,76,0.12)",
+                          background: "rgba(5,150,105,0.10)",
+                          border: "1px solid rgba(5,150,105,0.25)",
+                          boxShadow: "0 0 30px rgba(5,150,105,0.12)",
                         }}
                       >
-                        <Icon size={26} className="text-[#C9A84C]" />
+                        <Icon size={26} className="text-[#059669]" />
                       </div>
                       <span
-                        className="mb-2 block text-xs font-black tracking-[0.2em] uppercase text-[#C9A84C]"
+                        className="mb-2 block text-xs font-black tracking-[0.2em] uppercase text-[#059669]"
                       >
                         Étape {step.step}
                       </span>
                       <h3
-                        className="mb-3 text-xl font-bold text-[#F0EDE6]"
+                        className="mb-3 text-xl font-bold text-[#1c1917]"
                         style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
                       >
                         {step.title}
@@ -833,31 +833,31 @@ export default function Home() {
             <div
               className="cta-bg reveal relative overflow-hidden rounded-3xl px-8 py-16 text-center md:px-16 md:py-24"
               style={{
-                border: "1px solid rgba(201,168,76,0.20)",
-                boxShadow: "0 40px 100px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,168,76,0.10)",
+                border: "1px solid rgba(5,150,105,0.20)",
+                boxShadow: "0 40px 100px rgba(0,0,0,0.5), inset 0 1px 0 rgba(5,150,105,0.10)",
               }}
             >
               {/* Decorative orbs */}
               <div
                 className="pointer-events-none absolute -left-20 -top-20 h-60 w-60 rounded-full opacity-20 blur-3xl"
-                style={{ background: "#C9A84C" }}
+                style={{ background: "#059669" }}
               />
               <div
                 className="pointer-events-none absolute -bottom-20 -right-20 h-60 w-60 rounded-full opacity-15 blur-3xl"
-                style={{ background: "#E07A5F" }}
+                style={{ background: "#15803d" }}
               />
 
               <div className="relative z-10">
-                <span className="badge-gold mb-6 inline-flex">
+                <span className="badge-emerald mb-6 inline-flex">
                   <Play size={11} />
                   Prêt à démarrer ?
                 </span>
                 <h2
-                  className="mb-5 text-4xl font-black text-[#F0EDE6] md:text-6xl"
+                  className="mb-5 text-4xl font-black text-[#1c1917] md:text-6xl"
                   style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
                 >
                   Construisez une carrière{" "}
-                  <span className="text-gold-gradient">
+                  <span className="text-emerald-gradient">
                     brillante au Maroc
                   </span>
                 </h2>
@@ -868,13 +868,13 @@ export default function Home() {
                 <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                   <button
                     onClick={() => requireAuth("/search")}
-                    className="btn-gold rounded-xl px-9 py-4 text-base"
+                    className="btn-emerald rounded-xl px-9 py-4 text-base"
                   >
                     Voir les offres <ArrowRight size={18} />
                   </button>
                   <button
                     onClick={() => requireAuth("/cv/upload")}
-                    className="btn-outline-gold rounded-xl px-9 py-4 text-base"
+                    className="btn-outline-emerald rounded-xl px-9 py-4 text-base"
                   >
                     Analyser mon CV
                   </button>
@@ -888,8 +888,8 @@ export default function Home() {
       {/* ═══════════════════════════ FOOTER ═══════════════════════════ */}
       <footer
         style={{
-          background: "#07090F",
-          borderTop: "1px solid rgba(201,168,76,0.12)",
+          background: "#fafafa",
+          borderTop: "1px solid rgba(5,150,105,0.12)",
         }}
       >
         <div className="container py-14">
@@ -905,7 +905,7 @@ export default function Home() {
                 {[Linkedin, Twitter, Instagram, Facebook].map((Icon, i) => (
                   <button
                     key={i}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#C9A84C]/15 text-[#8B7D6B] transition-all hover:border-[#C9A84C]/40 hover:text-[#C9A84C]"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#059669]/15 text-[#8B7D6B] transition-all hover:border-[#059669]/40 hover:text-[#059669]"
                     aria-label={["LinkedIn", "Twitter", "Instagram", "Facebook"][i]}
                   >
                     <Icon size={15} />
@@ -931,13 +931,13 @@ export default function Home() {
                 },
               ].map((col) => (
                 <div key={col.title}>
-                  <p className="mb-4 text-xs font-black uppercase tracking-[0.15em] text-[#C9A84C]">
+                  <p className="mb-4 text-xs font-black uppercase tracking-[0.15em] text-[#059669]">
                     {col.title}
                   </p>
                   <ul className="space-y-2.5">
                     {col.links.map((link) => (
                       <li key={link}>
-                        <button className="text-sm text-[#8B7D6B] transition-colors hover:text-[#F0EDE6]">
+                        <button className="text-sm text-[#8B7D6B] transition-colors hover:text-[#1c1917]">
                           {link}
                         </button>
                       </li>
@@ -948,14 +948,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="divider-gold mb-7" />
+          <div className="divider-emerald mb-7" />
 
           <div className="flex flex-col items-center justify-between gap-4 text-xs text-[#8B7D6B] sm:flex-row">
             <p>© 2026 Emploi Maroc. Tous droits réservés.</p>
             <div className="flex gap-6">
-              <button className="hover:text-[#C9A84C] transition-colors">Confidentialité</button>
-              <button className="hover:text-[#C9A84C] transition-colors">Conditions</button>
-              <button className="hover:text-[#C9A84C] transition-colors">Cookies</button>
+              <button className="hover:text-[#059669] transition-colors">Confidentialité</button>
+              <button className="hover:text-[#059669] transition-colors">Conditions</button>
+              <button className="hover:text-[#059669] transition-colors">Cookies</button>
             </div>
           </div>
         </div>

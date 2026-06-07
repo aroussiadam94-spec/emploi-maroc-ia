@@ -127,21 +127,21 @@ export default function CVUpload() {
   const isProcessing = step === "uploading" || step === "analyzing";
 
   return (
-    <div className="app-shell min-h-screen" style={{ background: "#07090F" }}>
+    <div className="app-shell min-h-screen" style={{ background: "#fafafa" }}>
       {/* Header */}
-      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
+      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(5,150,105,0.12)" }}>
         <div className="container py-5 flex items-center justify-between">
           <BrandLogo onClick={() => navigate("/")} />
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/search")}
-              className="text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+              className="text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#059669]"
             >
               Recherche
             </button>
             <button
               onClick={() => navigate("/dashboard")}
-              className="text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+              className="text-sm font-medium text-[#8B7D6B] transition-colors hover:text-[#059669]"
             >
               Dashboard
             </button>
@@ -152,11 +152,11 @@ export default function CVUpload() {
       <main className="container max-w-5xl py-12">
         {step !== "result" && (
           <div className="text-center mb-10">
-            <span className="badge-gold mb-4 inline-flex">
+            <span className="badge-emerald mb-4 inline-flex">
               <Bot size={11} /> Analyse IA
             </span>
             <h1
-              className="text-4xl font-black text-[#F0EDE6] md:text-5xl"
+              className="text-4xl font-black text-[#1c1917] md:text-5xl"
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
             >
               Analysez votre CV
@@ -174,24 +174,24 @@ export default function CVUpload() {
             {!profileLoading && profileCvFileName && profileCvUrl && !isProcessing && !file && (
               <div
                 className="rounded-2xl p-6"
-                style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.20)" }}
+                style={{ background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.20)" }}
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div
                       className="flex h-12 w-12 items-center justify-center rounded-xl"
-                      style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}
+                      style={{ background: "rgba(5,150,105,0.15)", color: "#059669" }}
                     >
                       <UserRound size={22} />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-[#F0EDE6]">CV enregistré dans votre profil</p>
+                      <p className="text-sm font-bold text-[#1c1917]">CV enregistré dans votre profil</p>
                       <p className="text-sm text-[#8B7D6B] truncate max-w-[200px] sm:max-w-xs">{profileCvFileName}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => runAnalysis(profileCvFileName)}
-                    className="btn-gold rounded-xl px-5 py-2.5 text-sm w-full sm:w-auto flex justify-center"
+                    className="btn-emerald rounded-xl px-5 py-2.5 text-sm w-full sm:w-auto flex justify-center"
                   >
                     <Bot size={15} /> Analyser ce CV
                   </button>
@@ -201,44 +201,44 @@ export default function CVUpload() {
 
             {profileLoading && (
               <div className="flex justify-center py-6">
-                <Loader2 className="w-8 h-8 text-[#C9A84C] animate-spin" />
+                <Loader2 className="w-8 h-8 text-[#059669] animate-spin" />
               </div>
             )}
 
             {/* Upload Box */}
             <div
               className="rounded-3xl p-8"
-              style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}
+              style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.15)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}
             >
               {!file && !isProcessing ? (
                 <>
                   {profileCvFileName && (
                     <div className="flex items-center gap-4 mb-6">
-                      <div className="h-px flex-1 bg-[rgba(201,168,76,0.1)]"></div>
+                      <div className="h-px flex-1 bg-[rgba(5,150,105,0.1)]"></div>
                       <span className="text-xs font-bold uppercase tracking-widest text-[#8B7D6B]">OU NOUVEAU FICHIER</span>
-                      <div className="h-px flex-1 bg-[rgba(201,168,76,0.1)]"></div>
+                      <div className="h-px flex-1 bg-[rgba(5,150,105,0.1)]"></div>
                     </div>
                   )}
                   <div
                     {...getRootProps()}
                     className="rounded-2xl p-12 text-center cursor-pointer transition-all border-2 border-dashed"
                     style={{
-                      borderColor: isDragActive ? "rgba(201,168,76,0.6)" : "rgba(201,168,76,0.2)",
-                      background: isDragActive ? "rgba(201,168,76,0.05)" : "transparent",
+                      borderColor: isDragActive ? "rgba(5,150,105,0.6)" : "rgba(5,150,105,0.2)",
+                      background: isDragActive ? "rgba(5,150,105,0.05)" : "transparent",
                     }}
                   >
                     <input {...getInputProps()} />
                     <div
                       className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
-                      style={{ background: "rgba(201,168,76,0.10)", color: "#C9A84C" }}
+                      style={{ background: "rgba(5,150,105,0.10)", color: "#059669" }}
                     >
                       <UploadCloud size={28} />
                     </div>
-                    <h3 className="text-lg font-bold text-[#F0EDE6] mb-2" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                    <h3 className="text-lg font-bold text-[#1c1917] mb-2" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                       {profileCvFileName ? "Télécharger un autre CV" : "Glissez-déposez votre CV ici"}
                     </h3>
                     <p className="text-sm text-[#8B7D6B] mb-6">PDF, DOC ou DOCX · Max. 5 MB</p>
-                    <button className="btn-outline-gold rounded-xl px-6 py-2.5 text-sm pointer-events-none">
+                    <button className="btn-outline-emerald rounded-xl px-6 py-2.5 text-sm pointer-events-none">
                       Parcourir les fichiers
                     </button>
                   </div>
@@ -248,19 +248,19 @@ export default function CVUpload() {
                   {/* File preview */}
                   <div
                     className="flex items-center justify-between rounded-2xl p-5"
-                    style={{ background: "rgba(201,168,76,0.04)", border: "1px solid rgba(201,168,76,0.15)" }}
+                    style={{ background: "rgba(5,150,105,0.04)", border: "1px solid rgba(5,150,105,0.15)" }}
                   >
                     <div className="flex items-center gap-4 min-w-0">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(5,150,105,0.15)", color: "#059669" }}>
                         <FileText size={20} />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-[#F0EDE6] truncate">{file?.name || analyzingFileName}</p>
+                        <p className="text-sm font-bold text-[#1c1917] truncate">{file?.name || analyzingFileName}</p>
                         {file && <p className="text-xs text-[#8B7D6B]">{(file.size / 1024 / 1024).toFixed(2)} MB</p>}
                       </div>
                     </div>
                     {step === "idle" && file && (
-                      <button onClick={() => setFile(null)} className="shrink-0 p-2 text-[#8B7D6B] hover:text-[#E07A5F] transition-colors rounded-lg hover:bg-[rgba(224,122,95,0.1)]">
+                      <button onClick={() => setFile(null)} className="shrink-0 p-2 text-[#8B7D6B] hover:text-[#15803d] transition-colors rounded-lg hover:bg-[rgba(224,122,95,0.1)]">
                         <X size={18} />
                       </button>
                     )}
@@ -271,30 +271,30 @@ export default function CVUpload() {
                     <div className="space-y-3">
                       <div className="flex justify-between text-sm font-semibold">
                         <span className="text-[#8B7D6B]">Préparation de l'analyse...</span>
-                        <span className="text-[#C9A84C]">{uploadProgress}%</span>
+                        <span className="text-[#059669]">{uploadProgress}%</span>
                       </div>
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-[rgba(201,168,76,0.1)]">
-                        <div className="h-full bg-[#C9A84C] transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-[rgba(5,150,105,0.1)]">
+                        <div className="h-full bg-[#059669] transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
                       </div>
                     </div>
                   )}
 
                   {/* Analyzing */}
                   {step === "analyzing" && (
-                    <div className="rounded-2xl p-8 text-center" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.20)" }}>
-                      <Loader2 size={36} className="mx-auto mb-4 animate-spin text-[#C9A84C]" />
-                      <p className="text-lg font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Analyse IA en cours</p>
+                    <div className="rounded-2xl p-8 text-center" style={{ background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.20)" }}>
+                      <Loader2 size={36} className="mx-auto mb-4 animate-spin text-[#059669]" />
+                      <p className="text-lg font-bold text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Analyse IA en cours</p>
                       <p className="mt-2 text-sm text-[#8B7D6B]">L'assistant RH examine votre profil pour le marché marocain...</p>
                     </div>
                   )}
 
                   {/* Ready to analyze */}
                   {step === "idle" && file && (
-                    <div className="flex justify-end gap-3 pt-4 border-t border-[rgba(201,168,76,0.1)]">
-                      <button onClick={() => setFile(null)} className="rounded-xl px-5 py-2.5 text-sm font-medium text-[#8B7D6B] hover:text-[#F0EDE6]">
+                    <div className="flex justify-end gap-3 pt-4 border-t border-[rgba(5,150,105,0.1)]">
+                      <button onClick={() => setFile(null)} className="rounded-xl px-5 py-2.5 text-sm font-medium text-[#8B7D6B] hover:text-[#1c1917]">
                         Annuler
                       </button>
-                      <button onClick={() => runAnalysis(file.name)} className="btn-gold rounded-xl px-6 py-2.5 text-sm">
+                      <button onClick={() => runAnalysis(file.name)} className="btn-emerald rounded-xl px-6 py-2.5 text-sm">
                         <Bot size={15} /> Analyser mon CV
                       </button>
                     </div>
@@ -308,12 +308,12 @@ export default function CVUpload() {
           <div className="space-y-8 reveal" style={{ animation: "rise-in 600ms cubic-bezier(0.22,1,0.36,1) both" }}>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-black text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                <h1 className="text-3xl font-black text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                   Résultat de l'analyse
                 </h1>
                 {analyzingFileName && <p className="text-sm text-[#8B7D6B] mt-1">Fichier : {analyzingFileName}</p>}
               </div>
-              <button onClick={reset} className="btn-outline-gold rounded-xl px-4 py-2 text-sm flex items-center gap-2">
+              <button onClick={reset} className="btn-outline-emerald rounded-xl px-4 py-2 text-sm flex items-center gap-2">
                 <ArrowLeft size={14} /> Nouveau CV
               </button>
             </div>
@@ -322,15 +322,15 @@ export default function CVUpload() {
               {/* Score Card */}
               <div
                 className="rounded-3xl p-8 text-center flex flex-col items-center justify-center md:col-span-1 relative overflow-hidden"
-                style={{ background: "#C9A84C", boxShadow: "0 20px 60px rgba(201,168,76,0.25)" }}
+                style={{ background: "#059669", boxShadow: "0 20px 60px rgba(5,150,105,0.25)" }}
               >
                 <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,black_0%,transparent_100%)]"></div>
-                <div className="relative z-10 text-[#07090F]">
+                <div className="relative z-10 text-[#fafafa]">
                   <p className="font-bold uppercase tracking-widest text-xs opacity-80 mb-3">Score ATS Global</p>
                   <div className="text-7xl font-black tracking-tighter mb-2" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                     {analysisResult.atsScore}<span className="text-3xl opacity-60">/100</span>
                   </div>
-                  <div className="mt-4 inline-flex items-center gap-1.5 bg-[#07090F]/10 px-4 py-1.5 rounded-full text-sm font-black uppercase">
+                  <div className="mt-4 inline-flex items-center gap-1.5 bg-[#fafafa]/10 px-4 py-1.5 rounded-full text-sm font-black uppercase">
                     Grade {analysisResult.overallGrade}
                   </div>
                 </div>
@@ -339,21 +339,21 @@ export default function CVUpload() {
               {/* Summary Card */}
               <div
                 className="rounded-3xl p-8 md:col-span-2"
-                style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)" }}
+                style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.15)" }}
               >
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(5,150,105,0.15)", color: "#059669" }}>
                     <Bot size={18} />
                   </div>
-                  <h2 className="text-xl font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                  <h2 className="text-xl font-bold text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                     Résumé du profil
                   </h2>
                 </div>
                 <p className="text-base leading-relaxed text-[#8B7D6B] mb-6">{analysisResult.summary}</p>
                 
-                <div className="rounded-2xl p-5" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}>
-                  <h4 className="text-sm font-bold text-[#F0EDE6] mb-2 flex items-center gap-2">
-                    <Target size={16} className="text-[#C9A84C]" />
+                <div className="rounded-2xl p-5" style={{ background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.15)" }}>
+                  <h4 className="text-sm font-bold text-[#1c1917] mb-2 flex items-center gap-2">
+                    <Target size={16} className="text-[#059669]" />
                     Aperçu du marché marocain
                   </h4>
                   <p className="text-sm leading-relaxed text-[#8B7D6B]">{analysisResult.marketInsights}</p>
@@ -368,7 +368,7 @@ export default function CVUpload() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(52,211,153,0.15)", color: "#34D399" }}>
                     <Star size={18} />
                   </div>
-                  <h2 className="text-xl font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Points Forts</h2>
+                  <h2 className="text-xl font-bold text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Points Forts</h2>
                 </div>
                 <ul className="space-y-4">
                   {analysisResult.strengths.map((s: string, i: number) => (
@@ -383,15 +383,15 @@ export default function CVUpload() {
               {/* Weaknesses */}
               <div className="rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(224,122,95,0.2)" }}>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(224,122,95,0.15)", color: "#E07A5F" }}>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "rgba(224,122,95,0.15)", color: "#15803d" }}>
                     <AlertTriangle size={18} />
                   </div>
-                  <h2 className="text-xl font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Points à Améliorer</h2>
+                  <h2 className="text-xl font-bold text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Points à Améliorer</h2>
                 </div>
                 <ul className="space-y-4">
                   {analysisResult.weaknesses.map((w: string, i: number) => (
                     <li key={i} className="flex items-start gap-3 text-[#8B7D6B]">
-                      <Zap size={18} className="text-[#E07A5F] shrink-0 mt-0.5" />
+                      <Zap size={18} className="text-[#15803d] shrink-0 mt-0.5" />
                       <span>{w}</span>
                     </li>
                   ))}
@@ -400,22 +400,22 @@ export default function CVUpload() {
             </div>
 
             {/* Recommendations */}
-            <div className="rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)" }}>
+            <div className="rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.15)" }}>
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Recommandations d'Amélioration</h2>
+                <h2 className="text-2xl font-bold text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Recommandations d'Amélioration</h2>
                 <p className="text-sm text-[#8B7D6B] mt-1">Actions prioritaires pour booster votre profil</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
                 {analysisResult.tips.map((tip: any, i: number) => (
-                  <div key={i} className="rounded-2xl p-6" style={{ background: "rgba(201,168,76,0.04)", border: "1px solid rgba(201,168,76,0.1)" }}>
+                  <div key={i} className="rounded-2xl p-6" style={{ background: "rgba(5,150,105,0.04)", border: "1px solid rgba(5,150,105,0.1)" }}>
                     <div className="flex items-start justify-between gap-3 mb-4">
-                      <h4 className="font-bold text-[#F0EDE6] leading-tight">{tip.title}</h4>
+                      <h4 className="font-bold text-[#1c1917] leading-tight">{tip.title}</h4>
                       <span
                         className="shrink-0 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg"
                         style={{
-                          background: tip.priority === "high" ? "rgba(224,122,95,0.15)" : "rgba(201,168,76,0.15)",
-                          color: tip.priority === "high" ? "#E07A5F" : "#C9A84C",
+                          background: tip.priority === "high" ? "rgba(224,122,95,0.15)" : "rgba(5,150,105,0.15)",
+                          color: tip.priority === "high" ? "#15803d" : "#059669",
                         }}
                       >
                         {tip.priority === "high" ? "Haute" : "Conseillé"}
@@ -426,13 +426,13 @@ export default function CVUpload() {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-[rgba(201,168,76,0.1)] pt-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-[rgba(5,150,105,0.1)] pt-8">
                 <div>
-                  <h4 className="text-xs font-black tracking-widest uppercase text-[#C9A84C] mb-4">Sections Manquantes</h4>
+                  <h4 className="text-xs font-black tracking-widest uppercase text-[#059669] mb-4">Sections Manquantes</h4>
                   <div className="flex flex-wrap gap-2">
                     {analysisResult.missingSections.length > 0 ? (
                       analysisResult.missingSections.map((s: string, i: number) => (
-                        <span key={i} className="rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(224,122,95,0.1)", color: "#E07A5F", border: "1px solid rgba(224,122,95,0.2)" }}>
+                        <span key={i} className="rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(224,122,95,0.1)", color: "#15803d", border: "1px solid rgba(224,122,95,0.2)" }}>
                           + {s}
                         </span>
                       ))
@@ -442,10 +442,10 @@ export default function CVUpload() {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-xs font-black tracking-widest uppercase text-[#C9A84C] mb-4">Compétences Suggérées</h4>
+                  <h4 className="text-xs font-black tracking-widest uppercase text-[#059669] mb-4">Compétences Suggérées</h4>
                   <div className="flex flex-wrap gap-2">
                     {analysisResult.skillsToAdd.map((s: string, i: number) => (
-                      <span key={i} className="rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}>
+                      <span key={i} className="rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(5,150,105,0.1)", color: "#059669", border: "1px solid rgba(5,150,105,0.2)" }}>
                         {s}
                       </span>
                     ))}
@@ -455,7 +455,7 @@ export default function CVUpload() {
             </div>
             
             <div className="flex justify-center pb-8">
-               <button onClick={() => navigate("/dashboard")} className="btn-gold rounded-xl px-8 py-4 text-base">
+               <button onClick={() => navigate("/dashboard")} className="btn-emerald rounded-xl px-8 py-4 text-base">
                 Aller au Tableau de Bord <ArrowRight size={18} />
               </button>
             </div>
@@ -465,3 +465,4 @@ export default function CVUpload() {
     </div>
   );
 }
+

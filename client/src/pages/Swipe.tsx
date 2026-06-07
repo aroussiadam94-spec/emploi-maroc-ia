@@ -125,16 +125,16 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
   };
 
   return (
-    <div className="app-shell flex h-screen flex-col overflow-hidden" style={{ background: "#07090F" }}>
+    <div className="app-shell flex h-screen flex-col overflow-hidden" style={{ background: "#fafafa" }}>
       {/* Header */}
-      <header className="nav-glass z-10 shrink-0" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
+      <header className="nav-glass z-10 shrink-0" style={{ borderBottom: "1px solid rgba(5,150,105,0.12)" }}>
         <div className="container flex items-center justify-between py-4">
           <BrandLogo onClick={() => navigate("/")} />
           <div className="flex items-center gap-4">
-            <span className="badge-gold inline-flex"><Sparkles size={11} /> Mode Swipe IA</span>
+            <span className="badge-emerald inline-flex"><Sparkles size={11} /> Mode Swipe IA</span>
             <button
               onClick={() => navigate("/search")}
-              className="text-[#8B7D6B] transition-colors hover:text-[#C9A84C]"
+              className="text-[#8B7D6B] transition-colors hover:text-[#059669]"
             >
               <X size={24} />
             </button>
@@ -145,21 +145,21 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
       <div className="relative flex flex-1 min-h-0 items-center justify-center p-4">
         {isLoading ? (
           <div className="flex flex-col items-center gap-4 text-[#8B7D6B]">
-            <Loader2 size={32} className="animate-spin text-[#C9A84C]" />
+            <Loader2 size={32} className="animate-spin text-[#059669]" />
             <p>Recherche des meilleures offres...</p>
           </div>
         ) : jobs.length === 0 || currentIndex >= jobs.length ? (
-          <div className="rounded-3xl p-10 text-center" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(201,168,76,0.15)" }}>
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C" }}>
+          <div className="rounded-3xl p-10 text-center" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.15)" }}>
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl" style={{ background: "rgba(5,150,105,0.1)", color: "#059669" }}>
               <RefreshCw size={28} />
             </div>
-            <h2 className="mb-3 text-2xl font-black text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Plus d'offres disponibles</h2>
+            <h2 className="mb-3 text-2xl font-black text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Plus d'offres disponibles</h2>
             <p className="mb-8 text-sm text-[#8B7D6B]">Vous avez exploré toutes les offres suggérées.</p>
             <div className="flex flex-col gap-3">
-              <button onClick={() => refetch()} className="btn-outline-gold w-full rounded-xl py-3 text-sm flex justify-center items-center gap-2">
+              <button onClick={() => refetch()} className="btn-outline-emerald w-full rounded-xl py-3 text-sm flex justify-center items-center gap-2">
                 <RefreshCw size={14} /> Rafraîchir les offres
               </button>
-              <button onClick={() => navigate("/search")} className="btn-gold w-full rounded-xl py-3 text-sm">
+              <button onClick={() => navigate("/search")} className="btn-emerald w-full rounded-xl py-3 text-sm">
                 Retour à la recherche
               </button>
             </div>
@@ -194,22 +194,20 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
                   >
                     <div
                       className="pro-card flex h-full w-full flex-col overflow-hidden rounded-3xl"
-                      style={{ background: "#0E1020", border: "1px solid rgba(201,168,76,0.18)", boxShadow: "0 40px 80px rgba(0,0,0,0.6)" }}
+                      style={{ background: "#ffffff", border: "1px solid rgba(5,150,105,0.18)", boxShadow: "0 40px 80px rgba(0,0,0,0.6)" }}
                     >
                       {/* Swipe Overlays */}
                       {isTop && (
                         <>
                           <motion.div 
-                            style={{ opacity: likeOpacity }} 
                             className="absolute left-6 top-8 z-20 rounded-xl border-4 px-5 py-2 text-3xl font-black uppercase tracking-widest backdrop-blur-md"
-                            style={{ borderColor: "#34D399", color: "#34D399", background: "rgba(52,211,153,0.15)", rotate: "-15deg" }}
+                            style={{ opacity: likeOpacity, borderColor: "#34D399", color: "#34D399", background: "rgba(52,211,153,0.15)", rotate: "-15deg" }}
                           >
                             POSTULER
                           </motion.div>
                           <motion.div 
-                            style={{ opacity: nopeOpacity }} 
                             className="absolute right-6 top-8 z-20 rounded-xl border-4 px-5 py-2 text-3xl font-black uppercase tracking-widest backdrop-blur-md"
-                            style={{ borderColor: "#E07A5F", color: "#E07A5F", background: "rgba(224,122,95,0.15)", rotate: "15deg" }}
+                            style={{ opacity: nopeOpacity, borderColor: "#15803d", color: "#15803d", background: "rgba(224,122,95,0.15)", rotate: "15deg" }}
                           >
                             PASSER
                           </motion.div>
@@ -217,11 +215,11 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
                       )}
 
                       {/* Header Image Gradient */}
-                      <div className="relative h-36 shrink-0" style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(14,16,32,1) 100%)", borderBottom: "1px solid rgba(201,168,76,0.1)" }}>
+                      <div className="relative h-36 shrink-0" style={{ background: "linear-gradient(135deg, rgba(5,150,105,0.1) 0%, rgba(14,16,32,1) 100%)", borderBottom: "1px solid rgba(5,150,105,0.1)" }}>
                         <div className="absolute -bottom-8 left-6">
                           <div
                             className="flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-black text-white shadow-xl"
-                            style={{ background: "#1a2e4a", border: "4px solid #0E1020", fontFamily: "'Playfair Display', Georgia, serif" }}
+                            style={{ background: "#1a2e4a", border: "4px solid #ffffff", fontFamily: "'Playfair Display', Georgia, serif" }}
                           >
                             {job.company.charAt(0).toUpperCase()}
                           </div>
@@ -230,7 +228,7 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
 
                       <div className="flex flex-1 flex-col p-6 pt-12">
                         <div className="mb-4">
-                          <h2 className="mb-1 text-2xl font-bold leading-tight text-[#F0EDE6]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                          <h2 className="mb-1 text-2xl font-bold leading-tight text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                             {job.title}
                           </h2>
                           <div className="flex items-center gap-2 font-medium text-[#8B7D6B]">
@@ -240,12 +238,12 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
 
                         <div className="mb-6 flex flex-wrap gap-2">
                           {job.location && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[#1E2338] px-3 py-1 text-xs text-[#8B7D6B]">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[#f5f5f4] px-3 py-1 text-xs text-[#8B7D6B]">
                               <MapPin size={11} /> {job.location}
                             </span>
                           )}
                           {job.sector && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[#1E2338] px-3 py-1 text-xs text-[#8B7D6B]">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[#f5f5f4] px-3 py-1 text-xs text-[#8B7D6B]">
                               <Briefcase size={11} /> {job.sector}
                             </span>
                           )}
@@ -257,7 +255,7 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
                         </div>
 
                         <div className="relative flex-1 overflow-hidden">
-                          <div className="absolute bottom-0 z-10 h-16 w-full bg-gradient-to-t from-[#0E1020] to-transparent" />
+                          <div className="absolute bottom-0 z-10 h-16 w-full bg-gradient-to-t from-[#ffffff] to-transparent" />
                           <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#8B7D6B]">
                             {job.description}
                           </p>
@@ -265,30 +263,30 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
 
                         {/* AI Match Score */}
                         {isTop && (
-                          <div className="mt-4 shrink-0 rounded-2xl p-4" style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)" }}>
+                          <div className="mt-4 shrink-0 rounded-2xl p-4" style={{ background: "rgba(5,150,105,0.05)", border: "1px solid rgba(5,150,105,0.15)" }}>
                             <div className="mb-2 flex items-center gap-3">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(5,150,105,0.15)", color: "#059669" }}>
                                 <Sparkles size={18} />
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-end justify-between">
-                                  <span className="text-sm font-bold text-[#F0EDE6]">Match IA</span>
+                                  <span className="text-sm font-bold text-[#1c1917]">Match IA</span>
                                   {isScoring ? (
-                                    <Loader2 size={14} className="animate-spin text-[#C9A84C]" />
+                                    <Loader2 size={14} className="animate-spin text-[#059669]" />
                                   ) : matchScore ? (
                                     <span
                                       className="text-lg font-black"
-                                      style={{ color: matchScore.score >= 80 ? "#34D399" : matchScore.score >= 50 ? "#C9A84C" : "#E07A5F" }}
+                                      style={{ color: matchScore.score >= 80 ? "#34D399" : matchScore.score >= 50 ? "#059669" : "#15803d" }}
                                     >
                                       {matchScore.score}%
                                     </span>
                                   ) : null}
                                 </div>
                                 {!isScoring && matchScore && (
-                                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[rgba(201,168,76,0.1)]">
+                                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[rgba(5,150,105,0.1)]">
                                     <motion.div 
                                       className="h-full"
-                                      style={{ background: matchScore.score >= 80 ? "#34D399" : matchScore.score >= 50 ? "#C9A84C" : "#E07A5F" }}
+                                      style={{ background: matchScore.score >= 80 ? "#34D399" : matchScore.score >= 50 ? "#059669" : "#15803d" }}
                                       initial={{ width: 0 }}
                                       animate={{ width: `${matchScore.score}%` }}
                                       transition={{ duration: 1, ease: "easeOut" }}
@@ -320,7 +318,7 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
           <button 
             onClick={() => manualSwipe("left")}
             className="flex h-16 w-16 items-center justify-center rounded-full transition-all hover:scale-105 active:scale-95"
-            style={{ background: "rgba(14,16,32,0.8)", border: "2px solid rgba(224,122,95,0.3)", color: "#E07A5F", boxShadow: "0 10px 25px rgba(224,122,95,0.15)" }}
+            style={{ background: "rgba(14,16,32,0.8)", border: "2px solid rgba(224,122,95,0.3)", color: "#15803d", boxShadow: "0 10px 25px rgba(224,122,95,0.15)" }}
           >
             <X size={32} />
           </button>
@@ -328,7 +326,7 @@ Réponds STRICTEMENT avec un JSON valide sous ce format (sans markdown) :
           <button 
             onClick={() => window.open(`/jobs/${currentJob?.id}`, "_blank")}
             className="flex h-12 w-12 items-center justify-center rounded-full transition-all hover:scale-105 active:scale-95"
-            style={{ background: "rgba(14,16,32,0.8)", border: "2px solid rgba(201,168,76,0.3)", color: "#C9A84C", boxShadow: "0 10px 25px rgba(201,168,76,0.1)" }}
+            style={{ background: "rgba(14,16,32,0.8)", border: "2px solid rgba(5,150,105,0.3)", color: "#059669", boxShadow: "0 10px 25px rgba(5,150,105,0.1)" }}
           >
             <ExternalLink size={20} />
           </button>

@@ -12,8 +12,8 @@ import { useLocation } from "wouter";
 const tabClass = (active: boolean) =>
   `relative px-4 py-3 text-sm font-semibold transition-all ${
     active
-      ? "text-[#C9A84C] border-b-2 border-[#C9A84C]"
-      : "text-[#8B7D6B] border-b-2 border-transparent hover:text-[#F0EDE6]"
+      ? "text-[#059669] border-b-2 border-[#059669]"
+      : "text-[#8B7D6B] border-b-2 border-transparent hover:text-[#1c1917]"
   }`;
 
 export default function Dashboard() {
@@ -43,23 +43,23 @@ export default function Dashboard() {
 
   if (!isAuthenticated) {
     return (
-      <div className="app-shell flex min-h-screen items-center justify-center p-4" style={{ background: "#07090F" }}>
+      <div className="app-shell flex min-h-screen items-center justify-center p-4" style={{ background: "#fafafa" }}>
         <div
           className="max-w-md rounded-2xl p-10 text-center"
           style={{
             background: "rgba(14,16,32,0.85)",
-            border: "1px solid rgba(201,168,76,0.15)",
+            border: "1px solid rgba(5,150,105,0.15)",
             boxShadow: "0 40px 80px rgba(0,0,0,0.5)",
           }}
         >
           <div
             className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
-            style={{ background: "rgba(201,168,76,0.10)", color: "#C9A84C" }}
+            style={{ background: "rgba(5,150,105,0.10)", color: "#059669" }}
           >
             <UserRound size={28} />
           </div>
           <h2
-            className="text-2xl font-black text-[#F0EDE6]"
+            className="text-2xl font-black text-[#1c1917]"
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
           >
             Connexion requise
@@ -69,7 +69,7 @@ export default function Dashboard() {
           </p>
           <button
             onClick={() => (window.location.href = getLoginUrl())}
-            className="btn-gold mt-7 w-full rounded-xl py-3"
+            className="btn-emerald mt-7 w-full rounded-xl py-3"
           >
             Se connecter <ArrowRight size={16} />
           </button>
@@ -79,16 +79,16 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="app-shell min-h-screen" style={{ background: "#07090F" }}>
+    <div className="app-shell min-h-screen" style={{ background: "#fafafa" }}>
       {/* Header */}
-      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
+      <header className="nav-glass" style={{ borderBottom: "1px solid rgba(5,150,105,0.12)" }}>
         <div className="container py-5">
           <div className="mb-7 flex items-center justify-between gap-4">
             <BrandLogo onClick={() => navigate("/")} />
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm text-[#8B7D6B] transition-colors hover:text-[#E07A5F]"
-              style={{ background: "rgba(14,16,32,0.5)", border: "1px solid rgba(201,168,76,0.10)" }}
+              className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm text-[#8B7D6B] transition-colors hover:text-[#15803d]"
+              style={{ background: "rgba(14,16,32,0.5)", border: "1px solid rgba(5,150,105,0.10)" }}
             >
               <LogOut size={14} /> Déconnexion
             </button>
@@ -96,29 +96,29 @@ export default function Dashboard() {
 
           <div className="grid gap-5 lg:grid-cols-[1fr_minmax(300px,400px)] lg:items-end">
             <div>
-              <span className="badge-gold mb-3 inline-flex">Espace candidat</span>
+              <span className="badge-emerald mb-3 inline-flex">Espace candidat</span>
               <h1
-                className="text-3xl font-black text-[#F0EDE6]"
+                className="text-3xl font-black text-[#1c1917]"
                 style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
               >
                 Tableau de bord
               </h1>
               <p className="mt-2 text-[#8B7D6B]">
                 Bienvenue,{" "}
-                <span className="text-[#C9A84C]">{user?.name}</span>. Gardez votre recherche organisée.
+                <span className="text-[#059669]">{user?.name}</span>. Gardez votre recherche organisée.
               </p>
             </div>
 
             <button
               onClick={() => navigate("/search")}
-              className="group flex h-12 items-center gap-3 rounded-xl px-4 text-left text-sm text-[#8B7D6B] transition-all hover:border-[rgba(201,168,76,0.35)] hover:text-[#F0EDE6]"
-              style={{ background: "rgba(14,16,32,0.8)", border: "1px solid rgba(201,168,76,0.15)" }}
+              className="group flex h-12 items-center gap-3 rounded-xl px-4 text-left text-sm text-[#8B7D6B] transition-all hover:border-[rgba(5,150,105,0.35)] hover:text-[#1c1917]"
+              style={{ background: "rgba(14,16,32,0.8)", border: "1px solid rgba(5,150,105,0.15)" }}
             >
-              <Search size={15} className="text-[#C9A84C]" />
+              <Search size={15} className="text-[#059669]" />
               <span className="min-w-0 flex-1 truncate">Rechercher une offre...</span>
               <span
                 className="hidden rounded-lg px-2.5 py-1 text-xs font-bold transition-transform group-hover:translate-x-0.5 sm:inline"
-                style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}
+                style={{ background: "rgba(5,150,105,0.15)", color: "#059669" }}
               >
                 Ouvrir
               </span>
@@ -131,7 +131,7 @@ export default function Dashboard() {
         {/* Stat cards */}
         <div className="mb-8 grid gap-4 md:grid-cols-4">
           <StatCard icon={Briefcase} label="Candidatures"       value={applications.length.toString()} color="#7BA7BC" />
-          <StatCard icon={Heart}     label="Offres sauvegardées" value={savedJobs.length.toString()}   color="#E07A5F" />
+          <StatCard icon={Heart}     label="Offres sauvegardées" value={savedJobs.length.toString()}   color="#15803d" />
           <StatCard icon={Bell}      label="Alertes actives"     value={alerts.length.toString()}       color="#34D399" />
           <ProgressCard label="Profil complété" value={completion} />
         </div>
@@ -139,7 +139,7 @@ export default function Dashboard() {
         {/* Tabs */}
         <div
           className="mb-6 flex overflow-x-auto border-b"
-          style={{ borderColor: "rgba(201,168,76,0.12)" }}
+          style={{ borderColor: "rgba(5,150,105,0.12)" }}
         >
           {["profile", "applications", "saved", "alerts"].map((tab) => (
             <button
@@ -158,18 +158,18 @@ export default function Dashboard() {
             {/* Info card */}
             <div
               className="rounded-2xl p-7"
-              style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(201,168,76,0.12)" }}
+              style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(5,150,105,0.12)" }}
             >
               <div className="mb-7 flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div
                     className="flex h-11 w-11 items-center justify-center rounded-xl"
-                    style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C" }}
+                    style={{ background: "rgba(5,150,105,0.12)", color: "#059669" }}
                   >
                     <UserRound size={20} />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-[#F0EDE6]"
+                    <h2 className="text-xl font-bold text-[#1c1917]"
                         style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                       Informations personnelles
                     </h2>
@@ -178,8 +178,8 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => navigate("/profile/edit")}
-                  className="rounded-xl p-2.5 text-[#8B7D6B] transition-colors hover:bg-[rgba(201,168,76,0.10)] hover:text-[#C9A84C]"
-                  style={{ border: "1px solid rgba(201,168,76,0.12)" }}
+                  className="rounded-xl p-2.5 text-[#8B7D6B] transition-colors hover:bg-[rgba(5,150,105,0.10)] hover:text-[#059669]"
+                  style={{ border: "1px solid rgba(5,150,105,0.12)" }}
                 >
                   <Pencil size={15} />
                 </button>
@@ -190,17 +190,17 @@ export default function Dashboard() {
                   <div
                     key={item.label}
                     className="pb-4"
-                    style={{ borderBottom: "1px solid rgba(201,168,76,0.08)" }}
+                    style={{ borderBottom: "1px solid rgba(5,150,105,0.08)" }}
                   >
-                    <p className="text-xs font-black uppercase tracking-[0.15em] text-[#C9A84C]">{item.label}</p>
-                    <p className="mt-2 font-semibold text-[#F0EDE6]">{item.value}</p>
+                    <p className="text-xs font-black uppercase tracking-[0.15em] text-[#059669]">{item.label}</p>
+                    <p className="mt-2 font-semibold text-[#1c1917]">{item.value}</p>
                   </div>
                 ))}
               </div>
 
               <button
                 onClick={() => navigate("/profile/edit")}
-                className="btn-gold mt-7 rounded-xl px-6 py-3 text-sm"
+                className="btn-emerald mt-7 rounded-xl px-6 py-3 text-sm"
               >
                 Modifier le profil <ArrowRight size={15} />
               </button>
@@ -209,17 +209,17 @@ export default function Dashboard() {
             {/* CV card */}
             <div
               className="rounded-2xl p-7"
-              style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(201,168,76,0.12)" }}
+              style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(5,150,105,0.12)" }}
             >
               <div className="mb-7 flex items-center gap-3">
                 <div
                   className="flex h-11 w-11 items-center justify-center rounded-xl"
-                  style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C" }}
+                  style={{ background: "rgba(5,150,105,0.12)", color: "#059669" }}
                 >
                   <FileText size={20} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#F0EDE6]"
+                  <h2 className="text-xl font-bold text-[#1c1917]"
                       style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                     Curriculum Vitae
                   </h2>
@@ -235,7 +235,7 @@ export default function Dashboard() {
                   <div className="flex items-start gap-3">
                     <CheckCircle2 size={18} className="mt-0.5 shrink-0" style={{ color: "#34D399" }} />
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#F0EDE6]">CV actuellement téléversé</p>
+                      <p className="text-sm font-semibold text-[#1c1917]">CV actuellement téléversé</p>
                       <p className="mt-1 truncate text-sm text-[#8B7D6B]">{profile.cvFileName}</p>
                     </div>
                   </div>
@@ -243,10 +243,10 @@ export default function Dashboard() {
               ) : (
                 <div
                   className="rounded-xl p-8 text-center"
-                  style={{ border: "1px dashed rgba(201,168,76,0.20)", background: "rgba(201,168,76,0.03)" }}
+                  style={{ border: "1px dashed rgba(5,150,105,0.20)", background: "rgba(5,150,105,0.03)" }}
                 >
                   <AlertCircle size={28} className="mx-auto mb-3 text-[#8B7D6B]" />
-                  <p className="font-semibold text-[#F0EDE6]">Aucun CV téléversé</p>
+                  <p className="font-semibold text-[#1c1917]">Aucun CV téléversé</p>
                   <p className="mt-1 text-sm text-[#8B7D6B]">Ajoutez un CV pour obtenir de meilleurs matchs.</p>
                 </div>
               )}
@@ -254,13 +254,13 @@ export default function Dashboard() {
               <div className="mt-6 grid gap-3">
                 <button
                   onClick={() => navigate("/cv/upload")}
-                  className="btn-outline-gold w-full rounded-xl py-3 text-sm"
+                  className="btn-outline-emerald w-full rounded-xl py-3 text-sm"
                 >
                   {profile?.cvFileName ? "Remplacer le CV" : "Téléverser un CV"}
                 </button>
                 <button
                   onClick={() => navigate("/cv/upload")}
-                  className="btn-gold w-full rounded-xl py-3 text-sm"
+                  className="btn-emerald w-full rounded-xl py-3 text-sm"
                 >
                   Analyser avec l'IA
                 </button>
@@ -315,17 +315,17 @@ export default function Dashboard() {
                 <div
                   key={alert.id}
                   className="flex items-start justify-between gap-4 rounded-2xl p-5"
-                  style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(201,168,76,0.12)" }}
+                  style={{ background: "rgba(14,16,32,0.80)", border: "1px solid rgba(5,150,105,0.12)" }}
                 >
                   <div className="flex items-start gap-3">
                     <div
                       className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-                      style={{ background: "rgba(224,122,95,0.12)", color: "#E07A5F" }}
+                      style={{ background: "rgba(224,122,95,0.12)", color: "#15803d" }}
                     >
                       <Bell size={16} />
                     </div>
                     <div>
-                      <p className="font-semibold leading-tight text-[#F0EDE6]">{alert.name}</p>
+                      <p className="font-semibold leading-tight text-[#1c1917]">{alert.name}</p>
                       <p className="mt-1 text-xs text-[#8B7D6B]">
                         {[alert.sectors, alert.locations, alert.contractTypes].filter(Boolean).join(" • ") || "Toutes catégories"}
                       </p>
@@ -333,7 +333,7 @@ export default function Dashboard() {
                   </div>
                   <button
                     onClick={() => deleteAlertMutation.mutate({ alertId: alert.id })}
-                    className="shrink-0 rounded-lg p-1.5 text-[#8B7D6B] transition-colors hover:bg-[rgba(224,122,95,0.10)] hover:text-[#E07A5F]"
+                    className="shrink-0 rounded-lg p-1.5 text-[#8B7D6B] transition-colors hover:bg-[rgba(224,122,95,0.10)] hover:text-[#15803d]"
                     title="Supprimer l'alerte"
                   >
                     <Trash2 size={15} />
@@ -363,7 +363,7 @@ function StatCard({ icon: Icon, label, value, color }: { icon: any; label: strin
       className="rounded-2xl p-5"
       style={{
         background: "rgba(14,16,32,0.80)",
-        border: "1px solid rgba(201,168,76,0.12)",
+        border: "1px solid rgba(5,150,105,0.12)",
         animation: "rise-in 600ms cubic-bezier(0.22,1,0.36,1) both",
       }}
     >
@@ -371,7 +371,7 @@ function StatCard({ icon: Icon, label, value, color }: { icon: any; label: strin
         <div>
           <p className="text-sm font-medium text-[#8B7D6B]">{label}</p>
           <p
-            className="mt-2 text-3xl font-black text-[#F0EDE6]"
+            className="mt-2 text-3xl font-black text-[#1c1917]"
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
           >
             {value}
@@ -400,8 +400,8 @@ function ProgressCard({ label, value }: { label: string; value: number }) {
       className="rounded-2xl p-5"
       style={{
         background: "rgba(14,16,32,0.80)",
-        border: "1px solid rgba(201,168,76,0.18)",
-        boxShadow: "0 0 30px rgba(201,168,76,0.08)",
+        border: "1px solid rgba(5,150,105,0.18)",
+        boxShadow: "0 0 30px rgba(5,150,105,0.08)",
         animation: "rise-in 600ms cubic-bezier(0.22,1,0.36,1) both",
       }}
     >
@@ -409,7 +409,7 @@ function ProgressCard({ label, value }: { label: string; value: number }) {
         <div>
           <p className="text-sm font-medium text-[#8B7D6B]">{label}</p>
           <p
-            className="mt-2 text-3xl font-black text-[#C9A84C]"
+            className="mt-2 text-3xl font-black text-[#059669]"
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
           >
             {value}%
@@ -417,17 +417,17 @@ function ProgressCard({ label, value }: { label: string; value: number }) {
         </div>
         <div className="relative h-14 w-14">
           <svg viewBox="0 0 44 44" className="h-14 w-14 -rotate-90">
-            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(201,168,76,0.12)" strokeWidth="4" />
+            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(5,150,105,0.12)" strokeWidth="4" />
             <circle
               cx="22" cy="22" r="18" fill="none"
-              stroke="#C9A84C" strokeWidth="4"
+              stroke="#059669" strokeWidth="4"
               strokeLinecap="round"
               strokeDasharray={circumference}
               strokeDashoffset={dashOffset}
               className="transition-all duration-1000"
             />
           </svg>
-          <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-[#C9A84C]">
+          <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-[#059669]">
             {value}
           </span>
         </div>
@@ -442,20 +442,20 @@ function EmptyState({ icon: Icon, title, text, action, onClick }: {
   return (
     <div
       className="rounded-2xl px-6 py-16 text-center"
-      style={{ background: "rgba(14,16,32,0.5)", border: "1px solid rgba(201,168,76,0.08)" }}
+      style={{ background: "rgba(14,16,32,0.5)", border: "1px solid rgba(5,150,105,0.08)" }}
     >
       <div
         className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
-        style={{ background: "rgba(201,168,76,0.10)", color: "#C9A84C" }}
+        style={{ background: "rgba(5,150,105,0.10)", color: "#059669" }}
       >
         <Icon size={28} />
       </div>
-      <h2 className="text-xl font-bold text-[#F0EDE6]"
+      <h2 className="text-xl font-bold text-[#1c1917]"
           style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
         {title}
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-[#8B7D6B]">{text}</p>
-      <button onClick={onClick} className="btn-gold mt-7 rounded-xl px-6 py-3 text-sm">
+      <button onClick={onClick} className="btn-emerald mt-7 rounded-xl px-6 py-3 text-sm">
         {action} <ArrowRight size={15} />
       </button>
     </div>
@@ -469,25 +469,25 @@ function JobListItem({ job, onClick }: { job: any; onClick: () => void }) {
       className="cursor-pointer rounded-2xl p-5 transition-all hover:-translate-y-1"
       style={{
         background: "rgba(14,16,32,0.80)",
-        border: "1px solid rgba(201,168,76,0.12)",
+        border: "1px solid rgba(5,150,105,0.12)",
       }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(201,168,76,0.30)";
+        (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(5,150,105,0.30)";
         (e.currentTarget as HTMLDivElement).style.boxShadow = "0 20px 40px rgba(0,0,0,0.35)";
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(201,168,76,0.12)";
+        (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(5,150,105,0.12)";
         (e.currentTarget as HTMLDivElement).style.boxShadow = "";
       }}
     >
-      <h3 className="font-semibold leading-tight text-[#F0EDE6] line-clamp-2"
+      <h3 className="font-semibold leading-tight text-[#1c1917] line-clamp-2"
           style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
         {job.title}
       </h3>
       <p className="mt-2 text-sm text-[#8B7D6B]">{job.company}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         {job.location && (
-          <span className="rounded-full bg-[#1E2338] px-3 py-1 text-xs text-[#8B7D6B]">{job.location}</span>
+          <span className="rounded-full bg-[#f5f5f4] px-3 py-1 text-xs text-[#8B7D6B]">{job.location}</span>
         )}
         {job.contractType && (
           <span

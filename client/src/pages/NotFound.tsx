@@ -10,7 +10,7 @@ export default function NotFound() {
   };
 
   return (
-    <div className="app-shell flex min-h-screen flex-col" style={{ background: "#07090F" }}>
+    <div className="app-shell flex min-h-screen flex-col" style={{ background: "#fafafa" }}>
       <header className="nav-glass p-6">
         <BrandLogo onClick={handleGoHome} />
       </header>
@@ -26,19 +26,19 @@ export default function NotFound() {
         >
           <div className="mb-6 flex justify-center">
             <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl" style={{ background: "rgba(224,122,95,0.1)", border: "1px solid rgba(224,122,95,0.2)" }}>
-              <div className="absolute inset-0 animate-ping rounded-2xl opacity-20" style={{ background: "#E07A5F" }} />
-              <AlertCircle size={36} style={{ color: "#E07A5F" }} />
+              <div className="absolute inset-0 animate-ping rounded-2xl opacity-20" style={{ background: "#15803d" }} />
+              <AlertCircle size={36} style={{ color: "#15803d" }} />
             </div>
           </div>
 
           <h1
-            className="mb-2 text-6xl font-black text-[#F0EDE6]"
+            className="mb-2 text-6xl font-black text-[#1c1917]"
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
           >
             404
           </h1>
 
-          <h2 className="mb-4 text-xl font-bold text-[#E07A5F]">
+          <h2 className="mb-4 text-xl font-bold text-[#15803d]">
             Page introuvable
           </h2>
 
@@ -50,7 +50,7 @@ export default function NotFound() {
 
           <button
             onClick={handleGoHome}
-            className="btn-gold mx-auto flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm"
+            className="btn-emerald mx-auto flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm"
           >
             <ArrowLeft size={16} />
             Retour à l'accueil

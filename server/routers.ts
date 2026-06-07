@@ -1,8 +1,26 @@
+/**
+ * server/routers.ts
+ * tRPC application router – the single source of truth for all API endpoints.
+ *
+ * The router is organised into the following sub-routers:
+ *   system    – infrastructure procedures (health-check, version, etc.).
+ *   auth      – session management (me, logout).
+ *   candidate – candidate profile, experiences, educations, skills, preferences.
+ *   cv        – CV upload, removal, and AI analysis.
+ *   jobs      – job search, detail, applications, saved jobs, alerts, swipe feed.
+ *
+ * Access control:
+ *   publicProcedure    – no authentication required.
+ *   protectedProcedure – requires a valid session; throws UNAUTHED if missing.
+ */
+
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
+// Database query helpers for core entities.
 import { getCandidateByUserId, createOrUpdateCandidate, getJobOfferById, getJobOffers, createApplication, checkApplication, toggleSavedJob, checkSavedJob, getSavedJobs, getApplications, createJobAlert, getJobAlerts, deleteJobAlert } from "./db";
+// Profile sub-resource helpers (experiences, educations, skills, preferences).
 import {
   getExperiences,
   addExperience,
@@ -13,18 +31,30 @@ import {
   getSearchPreferences,
   upsertSearchPreferences,
 } from "./profile";
+// Job search engine and seed/stats helpers.
 import { searchJobs, SearchFilters } from "./search";
 import { seedMoroccoJobs, getJobStats } from "./scraper";
+// Cloud file storage helper.
 import { storagePut } from "./storage";
+// LLM integration for CV analysis.
 import { invokeLLM } from "./_core/llm";
+// Zod for input validation schemas.
 import { z } from "zod";
 
 export const appRouter = router({
+  // ── System ────────────────────────────────────────────────────────────────
+  // Health-check and platform info procedures (defined in _core/systemRouter).
   system: systemRouter,
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
   auth: router({
+    /** Returns the currently authenticated user, or null for anonymous visitors. */
     me: publicProcedure.query(opts => opts.ctx.user),
+
+    /** Clears the session cookie to log the user out. */
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
+      // maxAge: -1 instructs the browser to immediately expire the cookie.
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return {
         success: true,
@@ -32,11 +62,14 @@ export const appRouter = router({
     }),
   }),
 
+  // ── Candidate ─────────────────────────────────────────────────────────────
   candidate: router({
+    /** Returns the candidate profile for the logged-in user. */
     getProfile: protectedProcedure.query(async ({ ctx }) => {
       return getCandidateByUserId(ctx.user.id);
     }),
 
+    /** Updates top-level candidate fields: phone, location, bio. */
     updateProfile: protectedProcedure
       .input(
         z.object({
@@ -49,12 +82,14 @@ export const appRouter = router({
         return createOrUpdateCandidate(ctx.user.id, input);
       }),
 
+    /** Returns all work experiences for the logged-in candidate. */
     getExperiences: protectedProcedure.query(async ({ ctx }) => {
       const candidate = await getCandidateByUserId(ctx.user.id);
       if (!candidate) return [];
       return getExperiences(candidate.id);
     }),
 
+    /** Adds a new work-experience entry to the candidate's profile. */
     addExperience: protectedProcedure
       .input(
         z.object({
@@ -72,12 +107,14 @@ export const appRouter = router({
         return addExperience(candidate.id, input);
       }),
 
+    /** Returns all education entries for the logged-in candidate. */
     getEducations: protectedProcedure.query(async ({ ctx }) => {
       const candidate = await getCandidateByUserId(ctx.user.id);
       if (!candidate) return [];
       return getEducations(candidate.id);
     }),
 
+    /** Adds a new education entry to the candidate's profile. */
     addEducation: protectedProcedure
       .input(
         z.object({
@@ -95,12 +132,14 @@ export const appRouter = router({
         return addEducation(candidate.id, input);
       }),
 
+    /** Returns all skills for the logged-in candidate. */
     getSkills: protectedProcedure.query(async ({ ctx }) => {
       const candidate = await getCandidateByUserId(ctx.user.id);
       if (!candidate) return [];
       return getSkills(candidate.id);
     }),
 
+    /** Adds a new skill entry to the candidate's profile. */
     addSkill: protectedProcedure
       .input(
         z.object({
@@ -115,12 +154,14 @@ export const appRouter = router({
         return addSkill(candidate.id, input);
       }),
 
+    /** Returns the job-search preferences for the logged-in candidate. */
     getSearchPreferences: protectedProcedure.query(async ({ ctx }) => {
       const candidate = await getCandidateByUserId(ctx.user.id);
       if (!candidate) return null;
       return getSearchPreferences(candidate.id);
     }),
 
+    /** Creates or replaces the job-search preferences for the logged-in candidate. */
     updateSearchPreferences: protectedProcedure
       .input(
         z.object({
@@ -139,8 +180,12 @@ export const appRouter = router({
       }),
   }),
 
+  // ── CV ────────────────────────────────────────────────────────────────────
   cv: router({
     // Upload a CV file (base64 encoded)
+    /** Receives a base64-encoded CV file from the client and stores it.
+     *  Uses Forge/S3 when cloud credentials are available; falls back to
+     *  storing the data URI directly in the database for local development. */
     upload: protectedProcedure
       .input(
         z.object({
@@ -165,6 +210,7 @@ export const appRouter = router({
           cvUrl = `data:${input.mimeType};base64,${input.fileBase64}`;
         }
 
+        // Persist the CV URL and filename in the candidate's profile.
         await createOrUpdateCandidate(ctx.user.id, {
           cvUrl,
           cvFileName: input.fileName,
@@ -173,6 +219,7 @@ export const appRouter = router({
       }),
 
     // Remove a CV file
+    /** Clears the CV URL and filename from the candidate's profile. */
     remove: protectedProcedure
       .mutation(async ({ ctx }) => {
         await createOrUpdateCandidate(ctx.user.id, {
@@ -184,6 +231,12 @@ export const appRouter = router({
 
 
     // Analyze CV text with AI
+    /**
+     * Sends the extracted CV text to the LLM and returns a structured
+     * ATS analysis including score, strengths, weaknesses, and market insights
+     * tailored to the Moroccan job market.
+     * Falls back to hardcoded defaults if the LLM response is malformed JSON.
+     */
     analyze: protectedProcedure
       .input(
         z.object({
@@ -225,9 +278,11 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         if (typeof content !== "string") throw new Error("Invalid LLM response");
 
         try {
+          // Parse the JSON response from the LLM.
           return JSON.parse(content);
         } catch {
-          // Fallback if JSON parse fails
+          // Fallback if JSON parse fails – return sensible defaults so the
+          // UI doesn't break when the model produces unexpected output.
           return {
             atsScore: 65,
             overallGrade: "C",
@@ -247,7 +302,12 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
       }),
   }),
 
+  // ── Jobs ──────────────────────────────────────────────────────────────────
   jobs: router({
+    /**
+     * Full-text and filtered job search. Public so unauthenticated visitors
+     * can browse without logging in.
+     */
     search: publicProcedure
       .input(
         z.object({
@@ -266,6 +326,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return searchJobs(input as SearchFilters);
       }),
 
+    /** Returns a single job offer by its numeric ID. */
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
@@ -273,14 +334,19 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return getJobOfferById(input.id);
       }),
 
+    /** Seeds the database with the curated Moroccan job dataset.
+     *  Protected so only authenticated users can trigger the seed. */
     seed: protectedProcedure.mutation(async () => {
       return seedMoroccoJobs();
     }),
 
+    /** Returns basic statistics: total number of job offers in the database. */
     getStats: publicProcedure.query(async () => {
       return getJobStats();
     }),
 
+    /** Returns a randomised subset of job offers for the swipe interface.
+     *  Fetches 100 jobs and shuffles them so each session feels fresh. */
     getSwipeJobs: publicProcedure
       .input(z.object({ limit: z.number().default(20) }).optional())
       .query(async ({ input }) => {
@@ -289,6 +355,11 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return jobs.sort(() => 0.5 - Math.random()).slice(0, input?.limit || 20);
       }),
 
+    /**
+     * Submits a job application for the authenticated candidate.
+     * Optionally uploads a new CV file alongside the application.
+     * Throws if the candidate has already applied to the same job.
+     */
     submitApplication: protectedProcedure
       .input(
         z.object({
@@ -299,6 +370,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         })
       )
       .mutation(async ({ ctx, input }) => {
+        // Auto-create a candidate profile if the user doesn't have one yet.
         let candidate = await getCandidateByUserId(ctx.user.id);
         if (!candidate) {
           candidate = await createOrUpdateCandidate(ctx.user.id, {});
@@ -310,7 +382,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
           throw new Error("Vous avez déjà postulé à cette offre.");
         }
 
-        // Upload CV if provided
+        // Upload CV if provided alongside this application.
         if (input.cvFileBase64 && input.cvFileName && input.mimeType) {
           const hasForge = !!(process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_KEY);
           let cvUrl: string;
@@ -324,6 +396,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
             cvUrl = `data:${input.mimeType};base64,${input.cvFileBase64}`;
           }
 
+          // Update the candidate's CV with the newly uploaded file.
           await createOrUpdateCandidate(ctx.user.id, {
             cvUrl,
             cvFileName: input.cvFileName,
@@ -335,6 +408,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return { success: true };
       }),
 
+    /** Returns true if the authenticated candidate has already applied to a job. */
     hasApplied: protectedProcedure
       .input(z.object({ jobId: z.number() }))
       .query(async ({ ctx, input }) => {
@@ -343,9 +417,11 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return checkApplication(candidate.id, input.jobId);
       }),
 
+    /** Toggles the saved/unsaved state of a job for the authenticated candidate. */
     toggleSave: protectedProcedure
       .input(z.object({ jobId: z.number() }))
       .mutation(async ({ ctx, input }) => {
+        // Auto-create candidate profile if needed so anonymous-turned-users can save immediately.
         let candidate = await getCandidateByUserId(ctx.user.id);
         if (!candidate) {
           candidate = await createOrUpdateCandidate(ctx.user.id, {});
@@ -353,6 +429,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return toggleSavedJob(candidate.id, input.jobId);
       }),
 
+    /** Returns true if the authenticated candidate has saved a specific job. */
     isSaved: protectedProcedure
       .input(z.object({ jobId: z.number() }))
       .query(async ({ ctx, input }) => {
@@ -361,6 +438,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return checkSavedJob(candidate.id, input.jobId);
       }),
 
+    /** Returns all job offers the authenticated candidate has bookmarked. */
     getSavedJobs: protectedProcedure
       .query(async ({ ctx }) => {
         const candidate = await getCandidateByUserId(ctx.user.id);
@@ -368,6 +446,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return getSavedJobs(candidate.id);
       }),
 
+    /** Returns all job offers the authenticated candidate has applied to. */
     getApplications: protectedProcedure
       .query(async ({ ctx }) => {
         const candidate = await getCandidateByUserId(ctx.user.id);
@@ -375,6 +454,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return getApplications(candidate.id);
       }),
 
+    /** Creates a new job alert for the authenticated candidate. */
     createAlert: protectedProcedure
       .input(z.object({
         name: z.string(),
@@ -389,6 +469,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return createJobAlert(candidate.id, input);
       }),
 
+    /** Returns all job alerts belonging to the authenticated candidate. */
     getAlerts: protectedProcedure
       .query(async ({ ctx }) => {
         const candidate = await getCandidateByUserId(ctx.user.id);
@@ -396,6 +477,7 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
         return getJobAlerts(candidate.id);
       }),
 
+    /** Deletes a specific job alert owned by the authenticated candidate. */
     deleteAlert: protectedProcedure
       .input(z.object({ alertId: z.number() }))
       .mutation(async ({ ctx, input }) => {
@@ -406,4 +488,5 @@ Réponds UNIQUEMENT en JSON valide avec exactement cette structure :
   }),
 });
 
+// Export the router type so the tRPC client can be fully type-safe on the frontend.
 export type AppRouter = typeof appRouter;

@@ -1,5 +1,24 @@
+/**
+ * server/scraper.ts
+ * Job data seeding and cron-based job generation for the Moroccan job market.
+ *
+ * Two main exports:
+ *   seedMoroccoJobs   – inserts a curated set of real-looking Moroccan job offers
+ *                       on first run (skipped if ≥10 jobs already exist).
+ *   runCronScraper    – generates 100-150 random job offers; intended to be called
+ *                       on a periodic schedule to simulate new postings.
+ *   getJobStats       – returns the current total job count from the database.
+ *
+ * The MOROCCO_JOBS array below contains hand-crafted offer data covering
+ * multiple sectors (IT, Finance, Marketing, RH, Commerce, Logistique, BTP,
+ * Tourisme, Santé, Agriculture) and Morocco's main cities.
+ */
+
 import { getDb, isSqliteMode } from "./db";
 
+// ── Curated Moroccan job dataset ───────────────────────────────────────────────
+// Each entry represents a realistic job offer. The `skills` field is a JSON
+// string so it can be stored in a TEXT column and parsed at query time.
 const MOROCCO_JOBS = [
   // IT / Tech
   { title: "Développeur Full Stack React/Node.js", company: "Ynov Maroc", location: "Casablanca", sector: "IT", contractType: "CDI", experienceLevel: "Confirmé", salaryMin: "12000", salaryMax: "18000", source: "rekrute.com", description: "Nous recherchons un développeur Full Stack passionné. Maîtrise de React, Node.js, et bases de données SQL/NoSQL requise.", requirements: "React, Node.js, TypeScript, MySQL, Git, 3+ ans d'expérience", skills: '["React","Node.js","TypeScript","MySQL"]', sourceUrl: "https://www.rekrute.com" },
@@ -48,6 +67,13 @@ const MOROCCO_JOBS = [
   { title: "Traducteur Arabe-Français-Anglais", company: "Cabinet Translation Maroc", location: "Rabat", sector: "Autres", contractType: "Freelance", experienceLevel: "Junior", salaryMin: "5000", salaryMax: "10000", source: "emploi.ma", description: "Traductions de documents juridiques et techniques entre l'arabe, le français et l'anglais.", requirements: "Maîtrise trilingue, documentation technique, 1+ an", skills: '["Traduction","Arabe","Français","Anglais"]', sourceUrl: "https://www.emploi.ma" },
 ];
 
+/**
+ * Seeds the database with the curated MOROCCO_JOBS dataset.
+ * The seed is idempotent: if 10 or more jobs already exist the function
+ * returns immediately without inserting any duplicate rows.
+ *
+ * @returns Object with the count of inserted and skipped rows.
+ */
 export async function seedMoroccoJobs(): Promise<{ inserted: number; skipped: number }> {
   const db = await getDb();
   if (!db) {
@@ -72,6 +98,7 @@ export async function seedMoroccoJobs(): Promise<{ inserted: number; skipped: nu
       currentCount = Number(result[0]?.value ?? 0);
     }
 
+    // Skip seeding if data already exists to avoid duplicate entries.
     if (currentCount >= 10) {
       console.log(`[Scraper] ${currentCount} jobs already seeded, skipping.`);
       return { inserted: 0, skipped: MOROCCO_JOBS.length };
@@ -81,12 +108,16 @@ export async function seedMoroccoJobs(): Promise<{ inserted: number; skipped: nu
     let inserted = 0;
     const now = new Date();
 
+    // Insert each job offer individually so a single failure doesn't abort the rest.
     for (let i = 0; i < MOROCCO_JOBS.length; i++) {
       const job = MOROCCO_JOBS[i];
       try {
+        // Scatter publishedDate randomly within the past 30 days for realism.
         const daysAgo = Math.floor(Math.random() * 30);
         const publishedDate = new Date(now.getTime() - daysAgo * 86400000);
+        // Set expiry 30 days in the future.
         const expiryDate = new Date(now.getTime() + 30 * 86400000);
+        // Generate a unique external ID to prevent re-insertion on subsequent seeds.
         const externalId = `mock_${job.source}_${i}_${Date.now()}`;
 
         if (sqlite) {
@@ -105,11 +136,13 @@ export async function seedMoroccoJobs(): Promise<{ inserted: number; skipped: nu
             salaryMin: job.salaryMin,
             salaryMax: job.salaryMax,
             currency: "MAD",
+            // Store dates as ISO strings for SQLite TEXT columns.
             publishedDate: publishedDate.toISOString(),
             expiryDate: expiryDate.toISOString(),
             sourceUrl: job.sourceUrl,
+            // skills is already a JSON string for the TEXT column.
             skills: job.skills,
-          }).onConflictDoNothing();
+          }).onConflictDoNothing(); // Skip silently if externalId already exists.
         } else {
           const { jobOffers } = await import("../drizzle/schema");
           await db.insert(jobOffers).values({
@@ -129,6 +162,7 @@ export async function seedMoroccoJobs(): Promise<{ inserted: number; skipped: nu
             publishedDate,
             expiryDate,
             sourceUrl: job.sourceUrl,
+            // MySQL stores skills as a JSON array; parse the string first.
             skills: JSON.parse(job.skills),
           }).onDuplicateKeyUpdate({ set: { updatedAt: now } });
         }
@@ -146,6 +180,10 @@ export async function seedMoroccoJobs(): Promise<{ inserted: number; skipped: nu
   }
 }
 
+/**
+ * Returns the total number of job offers currently stored in the database.
+ * Used by the home page stats widget.
+ */
 export async function getJobStats() {
   const db = await getDb();
   if (!db) return { total: 0 };
@@ -161,6 +199,14 @@ export async function getJobStats() {
   }
 }
 
+/**
+ * Cron job that generates 100-150 randomised job offers to simulate daily
+ * new postings on the platform. Intended to be called by a scheduler
+ * (e.g. node-cron or a cloud cron trigger).
+ *
+ * The generated jobs use random combinations of titles, keywords, companies,
+ * cities, contract types, and experience levels drawn from the lists below.
+ */
 export async function runCronScraper(): Promise<void> {
   const db = await getDb();
   if (!db) {
@@ -170,12 +216,14 @@ export async function runCronScraper(): Promise<void> {
 
   try {
     const sqlite = isSqliteMode();
+    // Random count between 100 and 150 to simulate natural variation in new postings.
     const count = Math.floor(Math.random() * (150 - 100 + 1)) + 100; // Random between 100 and 150
     console.log(`[Cron Scraper] Generating ${count} mock jobs...`);
 
     let inserted = 0;
     const now = new Date();
 
+    // ── Vocabulary pools for random job generation ─────────────────────────
     const titles = ["Développeur", "Ingénieur", "Chef de Projet", "Consultant", "Data Scientist", "Architecte", "Technicien", "Responsable", "Manager", "Analyste"];
     const keywords = ["React", "Java", "Python", "Cloud", "Réseaux", "Cybersécurité", "Finance", "Marketing", "RH", "Vente"];
     const companies = ["Ynov Maroc", "Capgemini", "OCP", "Inwi", "Maroc Telecom", "Attijariwafa Bank", "CIH Bank", "Jumia", "LafargeHolcim", "Société Générale"];
@@ -184,6 +232,7 @@ export async function runCronScraper(): Promise<void> {
     const levels = ["Junior", "Confirmé", "Senior", "Expert"];
 
     for (let i = 0; i < count; i++) {
+      // Combine a random title prefix with a keyword to form the job title.
       const titlePrefix = titles[Math.floor(Math.random() * titles.length)];
       const titleSuffix = keywords[Math.floor(Math.random() * keywords.length)];
       const title = `${titlePrefix} ${titleSuffix}`;
@@ -193,13 +242,16 @@ export async function runCronScraper(): Promise<void> {
       const contractType = contractTypes[Math.floor(Math.random() * contractTypes.length)];
       const experienceLevel = levels[Math.floor(Math.random() * levels.length)];
       
+      // Generate a realistic salary range in MAD.
       const salaryMin = Math.floor(Math.random() * 10) * 1000 + 5000;
       const salaryMax = salaryMin + Math.floor(Math.random() * 10) * 1000 + 2000;
       const skillsStr = JSON.stringify([titleSuffix, "Travail en équipe", "Communication"]);
 
+      // Scatter published dates within the last 3 days so they appear recent.
       const daysAgo = Math.floor(Math.random() * 3);
       const publishedDate = new Date(now.getTime() - daysAgo * 86400000);
       const expiryDate = new Date(now.getTime() + 30 * 86400000);
+      // Unique ID prefixed with "cron_" to distinguish from seeded data.
       const externalId = `cron_${Date.now()}_${i}`;
 
       if (sqlite) {
