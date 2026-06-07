@@ -13,7 +13,7 @@
 
 export const ENV = {
   /** Application identifier used by the external OAuth portal. */
-  appId: process.env.VITE_APP_ID ?? "",
+  appId: process.env.APP_ID ?? process.env.VITE_APP_ID ?? "local",
 
   /** Secret used to sign JWT session tokens. Must be kept private. */
   cookieSecret: process.env.JWT_SECRET ?? "",
@@ -61,3 +61,4 @@ console.log('[ENV] GITHUB_CLIENT_ID set:', !!process.env.GITHUB_CLIENT_ID);
 console.log('[ENV] GITHUB_CLIENT_SECRET set:', !!process.env.GITHUB_CLIENT_SECRET);
 console.log('[ENV] OAUTH_SERVER_URL set:', !!process.env.OAUTH_SERVER_URL);
 console.log('[ENV] NODE_ENV:', process.env.NODE_ENV ?? '');
+console.log('[ENV] APP_ID:', process.env.APP_ID ?? process.env.VITE_APP_ID ?? '(defaulting to "local")');

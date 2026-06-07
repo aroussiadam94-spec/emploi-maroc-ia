@@ -40,8 +40,9 @@ import { storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
 // Zod for input validation schemas.
 import { z } from "zod";
-import crypto from "crypto";
+import { createHash, randomBytes, scryptSync } from "node:crypto";
 import { sdk } from "./_core/sdk";
+import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
   // ── System ────────────────────────────────────────────────────────────────
@@ -73,32 +74,38 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        const existingUser = await getUserByEmail(input.email);
-        if (existingUser) {
-          throw new Error("Cet email est déjà utilisé");
+        try {
+          const existingUser = await getUserByEmail(input.email);
+          if (existingUser) {
+            throw new TRPCError({ code: "CONFLICT", message: "Cet email est déjà utilisé" });
+          }
+
+          const salt = randomBytes(16).toString("hex");
+          const derivedKey = scryptSync(input.password, salt, 64).toString("hex");
+          const passwordHash = `${salt}:${derivedKey}`;
+          const openId = `local:${input.email}`;
+
+          await createLocalUser({
+            openId,
+            name: input.name,
+            email: input.email,
+            passwordHash,
+          });
+
+          const sessionToken = await sdk.createSessionToken(openId, {
+            name: input.name,
+            expiresInMs: ONE_YEAR_MS,
+          });
+
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+          return { success: true };
+        } catch (err) {
+          if (err instanceof TRPCError) throw err;
+          console.error("[Auth] registerLocal error:", err);
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: String((err as any)?.message ?? err) });
         }
-
-        const salt = crypto.randomBytes(16).toString("hex");
-        const derivedKey = crypto.scryptSync(input.password, salt, 64).toString("hex");
-        const passwordHash = `${salt}:${derivedKey}`;
-        const openId = `local:${input.email}`;
-
-        await createLocalUser({
-          openId,
-          name: input.name,
-          email: input.email,
-          passwordHash,
-        });
-
-        const sessionToken = await sdk.createSessionToken(openId, {
-          name: input.name,
-          expiresInMs: ONE_YEAR_MS,
-        });
-
-        const cookieOptions = getSessionCookieOptions(ctx.req);
-        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
-
-        return { success: true };
       }),
 
     /** Authenticates a user with email and password */
@@ -110,30 +117,36 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        const user = await getUserByEmail(input.email);
-        if (!user || !user.password) {
-          throw new Error("Email ou mot de passe incorrect");
+        try {
+          const user = await getUserByEmail(input.email);
+          if (!user || !user.password) {
+            throw new TRPCError({ code: "UNAUTHORIZED", message: "Email ou mot de passe incorrect" });
+          }
+
+          const [salt, key] = user.password.split(":");
+          if (!salt || !key) {
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Format de mot de passe invalide" });
+          }
+
+          const derivedKey = scryptSync(input.password, salt, 64).toString("hex");
+          if (derivedKey !== key) {
+            throw new TRPCError({ code: "UNAUTHORIZED", message: "Email ou mot de passe incorrect" });
+          }
+
+          const sessionToken = await sdk.createSessionToken(user.openId, {
+            name: user.name || "",
+            expiresInMs: ONE_YEAR_MS,
+          });
+
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+          return { success: true };
+        } catch (err) {
+          if (err instanceof TRPCError) throw err;
+          console.error("[Auth] loginLocal error:", err);
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: String((err as any)?.message ?? err) });
         }
-
-        const [salt, key] = user.password.split(":");
-        if (!salt || !key) {
-          throw new Error("Format de mot de passe invalide");
-        }
-
-        const derivedKey = crypto.scryptSync(input.password, salt, 64).toString("hex");
-        if (derivedKey !== key) {
-          throw new Error("Email ou mot de passe incorrect");
-        }
-
-        const sessionToken = await sdk.createSessionToken(user.openId, {
-          name: user.name || "",
-          expiresInMs: ONE_YEAR_MS,
-        });
-
-        const cookieOptions = getSessionCookieOptions(ctx.req);
-        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
-
-        return { success: true };
       }),
   }),
 
