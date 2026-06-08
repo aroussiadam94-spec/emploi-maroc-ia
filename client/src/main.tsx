@@ -57,13 +57,18 @@ queryClient.getMutationCache().subscribe(event => {
 });
 
 // Configure the tRPC client:
-// - Points to the /api/trpc endpoint served by the Express backend.
+// - In production, VITE_API_URL points to the deployed Express backend.
+// - In local dev, the Vite proxy forwards /api → localhost:3000.
 // - Uses SuperJSON for serialisation so Date objects travel correctly.
 // - Includes credentials (session cookie) with every request.
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api/trpc`
+  : "/api/trpc";
+
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: "/api/trpc",
+      url: API_BASE,
       transformer: superjson,
       fetch(input, init) {
         return globalThis.fetch(input, {

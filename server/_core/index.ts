@@ -35,8 +35,27 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
-  // Enable CORS (Critical for frontend hosted on another domain like Cloudflare Pages)
-  app.use(cors({ origin: process.env.CLIENT_URL || true, credentials: true }));
+  // Enable CORS for the deployed frontend on Cloudflare Pages and any other configured CLIENT_URL.
+  // The origin function allows localhost in dev and all pages.dev domains in production.
+  const allowedOrigins = [
+    process.env.CLIENT_URL,        // explicit override (e.g. custom domain)
+    "https://emploi-maroc-ia.pages.dev",
+    /\.pages\.dev$/,               // all Cloudflare Pages preview deployments
+    /^http:\/\/localhost(:\d+)?$/, // local development
+    /^http:\/\/127\.0\.0\.1(:\d+)?$/,
+  ].filter(Boolean);
+
+  app.use(cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      const allowed = allowedOrigins.some(o =>
+        typeof o === "string" ? o === origin : (o as RegExp).test(origin)
+      );
+      callback(null, allowed ? origin : false);
+    },
+    credentials: true,
+  }));
   
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
