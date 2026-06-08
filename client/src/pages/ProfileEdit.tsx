@@ -111,9 +111,9 @@ export default function ProfileEdit() {
   if (!isAuthenticated) {
     return (
       <div className="app-shell flex min-h-screen items-center justify-center p-4" style={{ background: "#fafafa" }}>
-        <div className="max-w-md rounded-2xl p-10 text-center" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.15)", boxShadow: "0 40px 80px rgba(0,0,0,0.5)" }}>
+        <div className="max-w-md rounded-2xl p-10 text-center bg-white shadow-xl border border-gray-100">
           <h2 className="mb-4 text-2xl font-black text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Connexion requise</h2>
-          <button onClick={() => navigate("/")} className="btn-emerald w-full rounded-xl py-3 text-sm">Retour à l'accueil</button>
+          <button onClick={() => navigate("/")} className="btn-emerald w-full rounded-xl py-3 text-sm text-white">Retour à l'accueil</button>
         </div>
       </div>
     );
@@ -149,7 +149,7 @@ export default function ProfileEdit() {
       </header>
 
       <main className="container py-8">
-        <div className="mx-auto max-w-3xl rounded-3xl p-8" style={{ background: "rgba(14,16,32,0.85)", border: "1px solid rgba(5,150,105,0.15)", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
+        <div className="mx-auto max-w-3xl rounded-3xl p-8 bg-white shadow-sm border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-8">
             
             <div className="grid gap-6 md:grid-cols-2">
@@ -158,8 +158,7 @@ export default function ProfileEdit() {
                   type="text"
                   value={user?.name || ""}
                   disabled
-                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(5,150,105,0.08)", color: "#8B7D6B" }}
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors border border-gray-200 bg-gray-50 text-gray-500"
                 />
               </Field>
               <Field label="Email" hint="Fourni par votre compte">
@@ -167,8 +166,7 @@ export default function ProfileEdit() {
                   type="email"
                   value={user?.email || ""}
                   disabled
-                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(5,150,105,0.08)", color: "#8B7D6B" }}
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors border border-gray-200 bg-gray-50 text-gray-500"
                 />
               </Field>
               <Field label="Téléphone">
@@ -177,8 +175,7 @@ export default function ProfileEdit() {
                   placeholder="+212 6XX XXX XXX"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#059669]/50"
-                  style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(5,150,105,0.2)", color: "#1c1917" }}
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors border border-gray-200 bg-white text-[#1c1917] focus:border-[#059669] focus:ring-1 focus:ring-[#059669]"
                 />
               </Field>
               <Field label="Localisation">
@@ -187,8 +184,7 @@ export default function ProfileEdit() {
                   placeholder="Casablanca, Maroc"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#059669]/50"
-                  style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(5,150,105,0.2)", color: "#1c1917" }}
+                  className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors border border-gray-200 bg-white text-[#1c1917] focus:border-[#059669] focus:ring-1 focus:ring-[#059669]"
                 />
               </Field>
             </div>
@@ -199,20 +195,16 @@ export default function ProfileEdit() {
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 rows={4}
-                className="w-full resize-none rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#059669]/50"
-                style={{ background: "rgba(14,16,32,0.6)", border: "1px solid rgba(5,150,105,0.2)", color: "#1c1917" }}
+                className="w-full resize-none rounded-xl px-4 py-3 text-sm outline-none transition-colors border border-gray-200 bg-white text-[#1c1917] focus:border-[#059669] focus:ring-1 focus:ring-[#059669]"
               />
             </Field>
 
             {/* CV Section */}
-            <div className="border-t border-[rgba(5,150,105,0.12)] pt-8">
+            <div className="border-t border-gray-100 pt-8">
               <h3 className="mb-4 text-lg font-bold text-[#1c1917]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Mon CV (PDF, DOC)</h3>
               
               {(profile as any)?.cvUrl && (profile as any)?.cvFileName ? (
-                <div
-                  className="flex items-center justify-between rounded-2xl p-5"
-                  style={{ background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.15)" }}
-                >
+                <div className="flex items-center justify-between rounded-2xl p-5 bg-emerald-50 border border-emerald-100">
                   <div className="flex items-center gap-4">
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(5,150,105,0.15)", color: "#059669" }}>
                       <FileText size={20} />
@@ -243,8 +235,8 @@ export default function ProfileEdit() {
                   {...getRootProps()}
                   className="cursor-pointer rounded-2xl border-2 border-dashed p-10 text-center transition-all"
                   style={{
-                    borderColor: isDragActive ? "rgba(5,150,105,0.5)" : "rgba(5,150,105,0.15)",
-                    background: isDragActive ? "rgba(5,150,105,0.05)" : "transparent"
+                    borderColor: isDragActive ? "#059669" : "#e5e7eb",
+                    background: isDragActive ? "#f0fdf4" : "#fafafa"
                   }}
                 >
                   <input {...getInputProps()} />
@@ -272,8 +264,8 @@ export default function ProfileEdit() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 border-t border-[rgba(5,150,105,0.12)] pt-6 sm:flex-row">
-              <button type="submit" disabled={loading} className="btn-emerald flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm">
+            <div className="flex flex-col gap-3 border-t border-gray-100 pt-6 sm:flex-row">
+              <button type="submit" disabled={loading} className="btn-emerald flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm text-white">
                 {loading ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
                 {loading ? "Enregistrement..." : "Enregistrer les modifications"}
               </button>
